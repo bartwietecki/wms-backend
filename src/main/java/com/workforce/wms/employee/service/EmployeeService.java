@@ -24,52 +24,79 @@ public class EmployeeService {
 
     @Transactional(readOnly = true)
     public List<EmployeeResponse> findAll() {
-        return employeeRepository.findAll().stream().map(this::toResponse).toList();
+        return employeeRepository.findAll().stream()
+                .map(this::toResponse)
+                .toList();
     }
 
-    public EmployeeResponse create(CreateEmployeeRequest createEmployeeRequest) {
-        if (employeeRepository.existsByEmail(createEmployeeRequest.email())) {
-            throw new EmailAlreadyExistsException(createEmployeeRequest.email());
+    public EmployeeResponse create(CreateEmployeeRequest request) {
+        if (employeeRepository.existsByEmail(request.email())) {
+            throw new EmailAlreadyExistsException(request.email());
         }
 
         Employee employee = new Employee();
-        employee.setFirstName(createEmployeeRequest.firstName());
-        employee.setLastName(createEmployeeRequest.lastName());
-        employee.setEmail(createEmployeeRequest.email());
-        employee.setPosition(createEmployeeRequest.position());
-        employee.setEmploymentType(createEmployeeRequest.employmentType());
-        employee.setActive(true);
+        mapFromCreate(employee, request);
 
         return toResponse(employeeRepository.save(employee));
     }
 
-    private EmployeeResponse toResponse(Employee employee) {
-        return new EmployeeResponse(
-                employee.getId(), employee.getFirstName(), employee.getLastName(),
-                employee.getEmail(), employee.getPosition(), employee.getEmploymentType(),
-                employee.isActive()
-        );
-    }
-
     @Transactional(readOnly = true)
     public EmployeeResponse findById(Long id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException(id));
+        return toResponse(getEmployeeOrThrow(id));
+    }
+
+    public EmployeeResponse update(Long id, UpdateEmployeeRequest request) {
+        Employee employee = getEmployeeOrThrow(id);
+        applyUpdate(employee, request);
+
+        return toResponse(employeeRepository.save(employee));
+    }
+
+    public EmployeeResponse activate(Long id) {
+        return setActive(id, true);
+    }
+
+    public EmployeeResponse deactivate(Long id) {
+        return setActive(id, false);
+    }
+
+    private EmployeeResponse setActive(Long id, boolean isActive) {
+        Employee employee = getEmployeeOrThrow(id);
+        employee.setActive(isActive);
         return toResponse(employee);
     }
 
-    @Transactional
-    public EmployeeResponse update(Long id, UpdateEmployeeRequest request) {
-        Employee employee = employeeRepository.findById(id)
+    private Employee getEmployeeOrThrow(Long id) {
+        return employeeRepository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
+    }
 
+    private void mapFromCreate(Employee employee, CreateEmployeeRequest request) {
+        employee.setFirstName(request.firstName());
+        employee.setLastName(request.lastName());
+        employee.setEmail(request.email());
+        employee.setPosition(request.position());
+        employee.setEmploymentType(request.employmentType());
+        employee.setActive(true);
+    }
+
+    private void applyUpdate(Employee employee, UpdateEmployeeRequest request) {
         employee.setFirstName(request.firstName());
         employee.setLastName(request.lastName());
         employee.setPosition(request.position());
         employee.setEmploymentType(request.employmentType());
+    }
 
-        Employee savedEmployee = employeeRepository.save(employee);
-        return toResponse(savedEmployee);
+    private EmployeeResponse toResponse(Employee employee) {
+        return new EmployeeResponse(
+                employee.getId(),
+                employee.getFirstName(),
+                employee.getLastName(),
+                employee.getEmail(),
+                employee.getPosition(),
+                employee.getEmploymentType(),
+                employee.isActive()
+        );
     }
 
 }
