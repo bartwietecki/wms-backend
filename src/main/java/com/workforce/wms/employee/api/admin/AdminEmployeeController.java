@@ -30,4 +30,9 @@ public class AdminEmployeeController {
         return employeeService.create(request);
     }
 
+    @GetMapping("/{id}")
+    public EmployeeResponse getEmployee(@PathVariable Long id) {
+        return employeeService.findById(id);
+    }
+
 }

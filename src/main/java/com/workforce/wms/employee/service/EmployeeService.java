@@ -1,5 +1,7 @@
 package com.workforce.wms.employee.service;
 
+import com.workforce.wms.common.error.EmailAlreadyExistsException;
+import com.workforce.wms.common.error.EmployeeNotFoundException;
 import com.workforce.wms.employee.api.dto.CreateEmployeeRequest;
 import com.workforce.wms.employee.api.dto.EmployeeResponse;
 import com.workforce.wms.employee.entity.Employee;
@@ -26,7 +28,7 @@ public class EmployeeService {
 
     public EmployeeResponse create(CreateEmployeeRequest createEmployeeRequest) {
         if (employeeRepository.existsByEmail(createEmployeeRequest.email())) {
-            throw new IllegalArgumentException("Employee with email already exists: " + createEmployeeRequest.email());
+            throw new EmailAlreadyExistsException(createEmployeeRequest.email());
         }
 
         Employee employee = new Employee();
@@ -46,6 +48,13 @@ public class EmployeeService {
                 employee.getEmail(), employee.getPosition(), employee.getEmploymentType(),
                 employee.isActive()
         );
+    }
+
+    @Transactional(readOnly = true)
+    public EmployeeResponse findById(Long id) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
+        return toResponse(employee);
     }
 
 }
