@@ -21,6 +21,7 @@ public class SecurityConfig {
                             .requestMatchers("/actuator/health/**", "/actuator/info").permitAll()
                             .requestMatchers("/api/ping").permitAll()
                             .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
                             .anyRequest().authenticated()
                     )
                     .httpBasic(Customizer.withDefaults())
