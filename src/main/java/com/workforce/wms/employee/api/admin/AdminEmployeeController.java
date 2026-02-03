@@ -2,6 +2,7 @@ package com.workforce.wms.employee.api.admin;
 
 import com.workforce.wms.employee.api.dto.CreateEmployeeRequest;
 import com.workforce.wms.employee.api.dto.EmployeeResponse;
+import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
 import com.workforce.wms.employee.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -34,5 +35,12 @@ public class AdminEmployeeController {
     public EmployeeResponse getEmployee(@PathVariable Long id) {
         return employeeService.findById(id);
     }
+
+    @PutMapping("/{id}")
+    public EmployeeResponse updateEmployee(@PathVariable Long id,
+                                           @Valid @RequestBody UpdateEmployeeRequest request) {
+        return employeeService.update(id, request);
+    }
+
 
 }

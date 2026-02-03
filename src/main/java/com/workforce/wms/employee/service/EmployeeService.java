@@ -4,6 +4,7 @@ import com.workforce.wms.common.error.EmailAlreadyExistsException;
 import com.workforce.wms.common.error.EmployeeNotFoundException;
 import com.workforce.wms.employee.api.dto.CreateEmployeeRequest;
 import com.workforce.wms.employee.api.dto.EmployeeResponse;
+import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
 import com.workforce.wms.employee.entity.Employee;
 import com.workforce.wms.employee.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
@@ -55,6 +56,20 @@ public class EmployeeService {
         Employee employee = employeeRepository.findById(id)
                 .orElseThrow(() -> new EmployeeNotFoundException(id));
         return toResponse(employee);
+    }
+
+    @Transactional
+    public EmployeeResponse update(Long id, UpdateEmployeeRequest request) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
+
+        employee.setFirstName(request.firstName());
+        employee.setLastName(request.lastName());
+        employee.setPosition(request.position());
+        employee.setEmploymentType(request.employmentType());
+
+        Employee savedEmployee = employeeRepository.save(employee);
+        return toResponse(savedEmployee);
     }
 
 }
