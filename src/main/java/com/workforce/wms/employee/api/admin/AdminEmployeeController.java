@@ -5,10 +5,11 @@ import com.workforce.wms.employee.api.dto.EmployeeResponse;
 import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
 import com.workforce.wms.employee.service.EmployeeService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/employees")
@@ -21,8 +22,11 @@ public class AdminEmployeeController {
     }
 
     @GetMapping
-    public List<EmployeeResponse> listEmployees() {
-        return employeeService.findAll();
+    public Page<EmployeeResponse> listEmployees(
+            @RequestParam(required = false) Boolean active,
+            @PageableDefault(size = 20) Pageable pageable
+    ) {
+        return employeeService.findAll(active, pageable);
     }
 
     @PostMapping
