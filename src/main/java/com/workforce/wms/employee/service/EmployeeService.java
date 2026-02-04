@@ -7,10 +7,10 @@ import com.workforce.wms.employee.api.dto.EmployeeResponse;
 import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
 import com.workforce.wms.employee.entity.Employee;
 import com.workforce.wms.employee.repository.EmployeeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
@@ -23,10 +23,12 @@ public class EmployeeService {
     }
 
     @Transactional(readOnly = true)
-    public List<EmployeeResponse> findAll() {
-        return employeeRepository.findAll().stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<EmployeeResponse> findAll(Boolean active, Pageable pageable) {
+        Page<Employee> page = (active == null)
+                ? employeeRepository.findAll(pageable)
+                : employeeRepository.findAllByActive(active, pageable);
+
+        return page.map(this::toResponse);
     }
 
     public EmployeeResponse create(CreateEmployeeRequest request) {
