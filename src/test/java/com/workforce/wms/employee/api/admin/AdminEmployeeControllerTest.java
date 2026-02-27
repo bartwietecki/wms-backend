@@ -1,9 +1,10 @@
 package com.workforce.wms.employee.api.admin;
 
-import com.workforce.wms.employee.api.dto.CreateEmployeeRequest;
-import com.workforce.wms.employee.api.dto.EmployeeResponse;
-import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
-import com.workforce.wms.employee.service.EmployeeService;
+import com.workforce.wms.api.admin.AdminEmployeeController;
+import com.workforce.wms.dto.employee.CreateEmployeeRequest;
+import com.workforce.wms.dto.employee.EmployeeResponse;
+import com.workforce.wms.dto.employee.UpdateEmployeeRequest;
+import com.workforce.wms.service.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

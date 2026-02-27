@@ -1,12 +1,12 @@
-package com.workforce.wms.employee.service;
+package com.workforce.wms.service;
 
 import com.workforce.wms.common.error.EmailAlreadyExistsException;
 import com.workforce.wms.common.error.EmployeeNotFoundException;
-import com.workforce.wms.employee.api.dto.CreateEmployeeRequest;
-import com.workforce.wms.employee.api.dto.EmployeeResponse;
-import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
-import com.workforce.wms.employee.entity.Employee;
-import com.workforce.wms.employee.repository.EmployeeRepository;
+import com.workforce.wms.dto.employee.CreateEmployeeRequest;
+import com.workforce.wms.dto.employee.EmployeeResponse;
+import com.workforce.wms.dto.employee.UpdateEmployeeRequest;
+import com.workforce.wms.entity.Employee;
+import com.workforce.wms.repository.EmployeeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

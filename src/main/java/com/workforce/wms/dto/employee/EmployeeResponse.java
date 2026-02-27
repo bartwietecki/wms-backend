@@ -1,4 +1,4 @@
-package com.workforce.wms.employee.api.dto;
+package com.workforce.wms.dto.employee;
 
 public record EmployeeResponse(
         Long id,

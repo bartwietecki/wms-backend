@@ -1,4 +1,4 @@
-package com.workforce.wms.employee.entity;
+package com.workforce.wms.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
