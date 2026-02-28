@@ -1,9 +1,9 @@
-package com.workforce.wms.employee.api.admin;
+package com.workforce.wms.api.admin;
 
-import com.workforce.wms.employee.api.dto.CreateEmployeeRequest;
-import com.workforce.wms.employee.api.dto.EmployeeResponse;
-import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
-import com.workforce.wms.employee.service.EmployeeService;
+import com.workforce.wms.dto.employee.CreateEmployeeRequest;
+import com.workforce.wms.dto.employee.EmployeeResponse;
+import com.workforce.wms.dto.employee.UpdateEmployeeRequest;
+import com.workforce.wms.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

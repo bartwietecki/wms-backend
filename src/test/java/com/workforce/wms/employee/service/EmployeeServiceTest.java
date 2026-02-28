@@ -2,10 +2,11 @@ package com.workforce.wms.employee.service;
 
 import com.workforce.wms.common.error.EmailAlreadyExistsException;
 import com.workforce.wms.common.error.EmployeeNotFoundException;
-import com.workforce.wms.employee.api.dto.CreateEmployeeRequest;
-import com.workforce.wms.employee.api.dto.UpdateEmployeeRequest;
-import com.workforce.wms.employee.entity.Employee;
-import com.workforce.wms.employee.repository.EmployeeRepository;
+import com.workforce.wms.dto.employee.CreateEmployeeRequest;
+import com.workforce.wms.dto.employee.UpdateEmployeeRequest;
+import com.workforce.wms.entity.Employee;
+import com.workforce.wms.repository.EmployeeRepository;
+import com.workforce.wms.service.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
