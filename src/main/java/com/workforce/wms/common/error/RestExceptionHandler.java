@@ -61,4 +61,14 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.badRequest().body(body);
     }
+
+    @ExceptionHandler(WorkEntryNotFoundException.class)
+    public ResponseEntity<ApiError> handleWorkEntryNotFound(WorkEntryNotFoundException ex) {
+        ApiError body = new ApiError(
+                "WORK_ENTRY_NOT_FOUND",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
 }
