@@ -51,4 +51,14 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
+
+    @ExceptionHandler(InvalidWorkEntryException.class)
+    public ResponseEntity<ApiError> handleInvalidWorkEntry(InvalidWorkEntryException ex) {
+        ApiError body = new ApiError(
+                "INVALID_WORK_ENTRY",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.badRequest().body(body);
+    }
 }
