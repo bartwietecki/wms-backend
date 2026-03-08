@@ -2,6 +2,7 @@ package com.workforce.wms.service;
 
 import com.workforce.wms.common.error.EmployeeNotFoundException;
 import com.workforce.wms.common.error.InvalidWorkEntryException;
+import com.workforce.wms.common.error.WorkEntryNotFoundException;
 import com.workforce.wms.dto.workentry.CreateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.entity.Employee;
@@ -61,6 +62,29 @@ public class WorkEntryService {
                 .toList();
     }
 
+    public WorkEntryResponse approve(Long id) {
+        WorkEntry workEntry = workEntryRepository.findById(id)
+                .orElseThrow(() -> new WorkEntryNotFoundException(id));
+
+        validatePending(workEntry);
+
+        workEntry.setStatus(WorkEntryStatus.APPROVED);
+        WorkEntry saved = workEntryRepository.save(workEntry);
+
+        return toResponse(saved);
+    }
+
+    public WorkEntryResponse reject(Long id) {
+        WorkEntry workEntry = workEntryRepository.findById(id)
+                .orElseThrow(() -> new WorkEntryNotFoundException(id));
+
+        validatePending(workEntry);
+
+        workEntry.setStatus(WorkEntryStatus.REJECTED);
+        WorkEntry saved = workEntryRepository.save(workEntry);
+
+        return toResponse(saved);
+    }
 
     private void validateCreateRequest(CreateWorkEntryRequest request) {
         if (request == null) {
@@ -71,6 +95,14 @@ public class WorkEntryService {
         }
         if (request.minutes() <= 0) {
             throw new InvalidWorkEntryException("minutes must be > 0");
+        }
+    }
+
+    private void validatePending(WorkEntry workEntry) {
+        if (workEntry.getStatus() != WorkEntryStatus.PENDING) {
+            throw new InvalidWorkEntryException(
+                    "Only PENDING work entry can be changed. Current status: " + workEntry.getStatus()
+            );
         }
     }
 
