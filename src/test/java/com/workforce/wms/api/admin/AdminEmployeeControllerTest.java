@@ -1,6 +1,5 @@
-package com.workforce.wms.employee.api.admin;
+package com.workforce.wms.api.admin;
 
-import com.workforce.wms.api.admin.AdminEmployeeController;
 import com.workforce.wms.dto.employee.CreateEmployeeRequest;
 import com.workforce.wms.dto.employee.EmployeeResponse;
 import com.workforce.wms.dto.employee.UpdateEmployeeRequest;
