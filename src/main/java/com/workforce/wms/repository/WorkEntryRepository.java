@@ -9,11 +9,13 @@ import java.util.List;
 
 public interface WorkEntryRepository extends JpaRepository<WorkEntry, Long> {
 
-    List<WorkEntry> findAllByEmployeeIdAndWorkDateBetween(
+    List<WorkEntry> findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(
             Long employeeId,
             LocalDate from,
             LocalDate to
     );
+
+    List<WorkEntry> findAllByOrderByWorkDateDesc();
 
     List<WorkEntry> findAllByStatus(WorkEntryStatus status);
 }

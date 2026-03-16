@@ -56,7 +56,15 @@ public class WorkEntryService {
             throw new InvalidWorkEntryException("from must be <= to");
         }
 
-        return workEntryRepository.findAllByEmployeeIdAndWorkDateBetween(employeeId, from, to)
+        return workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(employeeId, from, to)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkEntryResponse> findAll() {
+        return workEntryRepository.findAllByOrderByWorkDateDesc()
                 .stream()
                 .map(this::toResponse)
                 .toList();

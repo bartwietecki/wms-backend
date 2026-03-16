@@ -104,7 +104,7 @@ class WorkEntryServiceTest {
 
     @Test
     void myEntries_whenValidRange_shouldReturnMappedResponses() {
-        when(workEntryRepository.findAllByEmployeeIdAndWorkDateBetween(
+        when(workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(
                 1L,
                 LocalDate.of(2026, 3, 1),
                 LocalDate.of(2026, 3, 31)
@@ -121,6 +121,33 @@ class WorkEntryServiceTest {
         assertThat(result.getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
         assertThat(result.getFirst().minutes()).isEqualTo(120);
         assertThat(result.getFirst().description()).isEqualTo("Worked on WMS Project");
+    }
+
+    @Test
+    void findAll_shouldReturnMappedResponses() {
+        when(workEntryRepository.findAllByOrderByWorkDateDesc())
+                .thenReturn(List.of(pendingWorkEntry));
+
+        var result = workEntryService.findAll();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id()).isEqualTo(10L);
+        assertThat(result.getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
+        assertThat(result.getFirst().minutes()).isEqualTo(120);
+        assertThat(result.getFirst().description()).isEqualTo("Worked on WMS Project");
+
+        verify(workEntryRepository).findAllByOrderByWorkDateDesc();
+    }
+
+    @Test
+    void findAll_whenNoEntries_shouldReturnEmptyList() {
+        when(workEntryRepository.findAllByOrderByWorkDateDesc())
+                .thenReturn(List.of());
+
+        var result = workEntryService.findAll();
+
+        assertThat(result).isEmpty();
+        verify(workEntryRepository).findAllByOrderByWorkDateDesc();
     }
 
     @Test
