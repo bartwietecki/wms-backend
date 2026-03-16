@@ -124,6 +124,33 @@ class WorkEntryServiceTest {
     }
 
     @Test
+    void findAll_shouldReturnMappedResponses() {
+        when(workEntryRepository.findAllByOrderByWorkDateDesc())
+                .thenReturn(List.of(pendingWorkEntry));
+
+        var result = workEntryService.findAll();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.getFirst().id()).isEqualTo(10L);
+        assertThat(result.getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
+        assertThat(result.getFirst().minutes()).isEqualTo(120);
+        assertThat(result.getFirst().description()).isEqualTo("Worked on WMS Project");
+
+        verify(workEntryRepository).findAllByOrderByWorkDateDesc();
+    }
+
+    @Test
+    void findAll_whenNoEntries_shouldReturnEmptyList() {
+        when(workEntryRepository.findAllByOrderByWorkDateDesc())
+                .thenReturn(List.of());
+
+        var result = workEntryService.findAll();
+
+        assertThat(result).isEmpty();
+        verify(workEntryRepository).findAllByOrderByWorkDateDesc();
+    }
+
+    @Test
     void approve_whenStatusIsPending_shouldSetApproved() {
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
         when(workEntryRepository.save(any(WorkEntry.class))).thenAnswer(inv -> inv.getArgument(0));
