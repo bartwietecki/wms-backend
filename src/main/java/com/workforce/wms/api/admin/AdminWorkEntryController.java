@@ -2,10 +2,9 @@ package com.workforce.wms.api.admin;
 
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.service.WorkEntryService;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin/work-entries")
@@ -15,6 +14,11 @@ public class AdminWorkEntryController {
 
     public AdminWorkEntryController(WorkEntryService workEntryService) {
         this.workEntryService = workEntryService;
+    }
+
+    @GetMapping
+    public List<WorkEntryResponse> getAll() {
+        return workEntryService.findAll();
     }
 
     @PostMapping("/{id}/approve")

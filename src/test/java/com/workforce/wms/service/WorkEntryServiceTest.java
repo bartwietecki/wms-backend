@@ -104,7 +104,7 @@ class WorkEntryServiceTest {
 
     @Test
     void myEntries_whenValidRange_shouldReturnMappedResponses() {
-        when(workEntryRepository.findAllByEmployeeIdAndWorkDateBetween(
+        when(workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(
                 1L,
                 LocalDate.of(2026, 3, 1),
                 LocalDate.of(2026, 3, 31)
