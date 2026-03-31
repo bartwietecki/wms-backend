@@ -18,4 +18,6 @@ public interface WorkEntryRepository extends JpaRepository<WorkEntry, Long> {
     List<WorkEntry> findAllByOrderByWorkDateDesc();
 
     List<WorkEntry> findAllByStatus(WorkEntryStatus status);
+
+    boolean existsByEmployeeId(Long employeeId);
 }
