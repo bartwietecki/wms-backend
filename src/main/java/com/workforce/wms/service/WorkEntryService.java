@@ -4,6 +4,7 @@ import com.workforce.wms.common.error.EmployeeNotFoundException;
 import com.workforce.wms.common.error.InvalidWorkEntryException;
 import com.workforce.wms.common.error.WorkEntryNotFoundException;
 import com.workforce.wms.dto.workentry.CreateWorkEntryRequest;
+import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.entity.Employee;
 import com.workforce.wms.entity.WorkEntry;
@@ -92,6 +93,17 @@ public class WorkEntryService {
         WorkEntry saved = workEntryRepository.save(workEntry);
 
         return toResponse(saved);
+    }
+
+    public WorkEntryResponse update(Long id, UpdateWorkEntryRequest request) {
+        WorkEntry workEntry = workEntryRepository.findById(id)
+                .orElseThrow(() -> new WorkEntryNotFoundException(id));
+
+        workEntry.setWorkDate(request.workDate());
+        workEntry.setMinutes(request.minutes());
+        workEntry.setDescription(trimToNull(request.description()));
+
+        return toResponse(workEntryRepository.save(workEntry));
     }
 
     private void validateCreateRequest(CreateWorkEntryRequest request) {

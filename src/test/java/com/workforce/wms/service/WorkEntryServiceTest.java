@@ -3,6 +3,7 @@ package com.workforce.wms.service;
 import com.workforce.wms.common.error.InvalidWorkEntryException;
 import com.workforce.wms.common.error.WorkEntryNotFoundException;
 import com.workforce.wms.dto.workentry.CreateWorkEntryRequest;
+import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.entity.Employee;
 import com.workforce.wms.entity.WorkEntry;
 import com.workforce.wms.entity.WorkEntryStatus;
@@ -154,6 +155,46 @@ class WorkEntryServiceTest {
 
         assertThat(result).isEmpty();
         verify(workEntryRepository).findAllByOrderByWorkDateDesc();
+    }
+
+    @Test
+    void update_shouldUpdateFieldsAndReturnResponse() {
+        UpdateWorkEntryRequest request = new UpdateWorkEntryRequest(
+                LocalDate.of(2026, 4, 1),
+                90,
+                "Updated description"
+        );
+
+        when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
+        when(workEntryRepository.save(any(WorkEntry.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        var response = workEntryService.update(10L, request);
+
+        verify(workEntryRepository).save(workEntryCaptor.capture());
+        WorkEntry saved = workEntryCaptor.getValue();
+
+        assertThat(saved.getWorkDate()).isEqualTo(LocalDate.of(2026, 4, 1));
+        assertThat(saved.getMinutes()).isEqualTo(90);
+        assertThat(saved.getDescription()).isEqualTo("Updated description");
+
+        assertThat(response.workDate()).isEqualTo(LocalDate.of(2026, 4, 1));
+        assertThat(response.minutes()).isEqualTo(90);
+        assertThat(response.description()).isEqualTo("Updated description");
+        assertThat(response.employeeId()).isEqualTo(1L);
+    }
+
+    @Test
+    void update_whenWorkEntryDoesNotExist_shouldThrow() {
+        UpdateWorkEntryRequest request = new UpdateWorkEntryRequest(
+                LocalDate.of(2026, 4, 1), 60, null
+        );
+
+        when(workEntryRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> workEntryService.update(999L, request))
+                .isInstanceOf(WorkEntryNotFoundException.class);
+
+        verify(workEntryRepository, never()).save(any(WorkEntry.class));
     }
 
     @Test
