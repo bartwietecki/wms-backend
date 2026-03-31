@@ -198,6 +198,25 @@ class WorkEntryServiceTest {
     }
 
     @Test
+    void delete_shouldDeleteWorkEntry() {
+        when(workEntryRepository.existsById(10L)).thenReturn(true);
+
+        workEntryService.delete(10L);
+
+        verify(workEntryRepository).deleteById(10L);
+    }
+
+    @Test
+    void delete_whenWorkEntryDoesNotExist_shouldThrow() {
+        when(workEntryRepository.existsById(999L)).thenReturn(false);
+
+        assertThatThrownBy(() -> workEntryService.delete(999L))
+                .isInstanceOf(WorkEntryNotFoundException.class);
+
+        verify(workEntryRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
     void approve_whenStatusIsPending_shouldSetApproved() {
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
         when(workEntryRepository.save(any(WorkEntry.class))).thenAnswer(inv -> inv.getArgument(0));

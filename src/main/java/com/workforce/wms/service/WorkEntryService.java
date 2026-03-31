@@ -106,6 +106,13 @@ public class WorkEntryService {
         return toResponse(workEntryRepository.save(workEntry));
     }
 
+    public void delete(Long id) {
+        if (!workEntryRepository.existsById(id)) {
+            throw new WorkEntryNotFoundException(id);
+        }
+        workEntryRepository.deleteById(id);
+    }
+
     private void validateCreateRequest(CreateWorkEntryRequest request) {
         if (request == null) {
             throw new InvalidWorkEntryException("request cannot be null");

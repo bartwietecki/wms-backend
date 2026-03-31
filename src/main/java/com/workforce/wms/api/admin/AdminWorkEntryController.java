@@ -4,6 +4,7 @@ import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.service.WorkEntryService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,6 +28,12 @@ public class AdminWorkEntryController {
     public WorkEntryResponse update(@PathVariable Long id,
                                     @Valid @RequestBody UpdateWorkEntryRequest request) {
         return workEntryService.update(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        workEntryService.delete(id);
     }
 
     @PostMapping("/{id}/approve")
