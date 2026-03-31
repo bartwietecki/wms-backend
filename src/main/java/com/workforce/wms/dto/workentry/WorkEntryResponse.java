@@ -6,6 +6,8 @@ import java.time.LocalDate;
 
 public record WorkEntryResponse (
         Long id,
+        Long employeeId,
+        String employeeName,
         LocalDate workDate,
         int minutes,
         String description,
