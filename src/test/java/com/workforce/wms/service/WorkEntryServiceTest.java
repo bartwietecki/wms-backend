@@ -82,6 +82,8 @@ class WorkEntryServiceTest {
         assertThat(toSave.getStatus()).isEqualTo(WorkEntryStatus.PENDING);
 
         assertThat(response.id()).isEqualTo(10L);
+        assertThat(response.employeeId()).isEqualTo(1L);
+        assertThat(response.employeeName()).isEqualTo("John Doe");
         assertThat(response.status()).isEqualTo(WorkEntryStatus.PENDING);
         assertThat(response.minutes()).isEqualTo(120);
     }
@@ -118,6 +120,8 @@ class WorkEntryServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().id()).isEqualTo(10L);
+        assertThat(result.getFirst().employeeId()).isEqualTo(1L);
+        assertThat(result.getFirst().employeeName()).isEqualTo("John Doe");
         assertThat(result.getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
         assertThat(result.getFirst().minutes()).isEqualTo(120);
         assertThat(result.getFirst().description()).isEqualTo("Worked on WMS Project");
@@ -132,6 +136,8 @@ class WorkEntryServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().id()).isEqualTo(10L);
+        assertThat(result.getFirst().employeeId()).isEqualTo(1L);
+        assertThat(result.getFirst().employeeName()).isEqualTo("John Doe");
         assertThat(result.getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
         assertThat(result.getFirst().minutes()).isEqualTo(120);
         assertThat(result.getFirst().description()).isEqualTo("Worked on WMS Project");
@@ -162,6 +168,8 @@ class WorkEntryServiceTest {
 
         assertThat(saved.getStatus()).isEqualTo(WorkEntryStatus.APPROVED);
         assertThat(response.status()).isEqualTo(WorkEntryStatus.APPROVED);
+        assertThat(response.employeeId()).isEqualTo(1L);
+        assertThat(response.employeeName()).isEqualTo("John Doe");
     }
 
     @Test
@@ -176,6 +184,8 @@ class WorkEntryServiceTest {
 
         assertThat(saved.getStatus()).isEqualTo(WorkEntryStatus.REJECTED);
         assertThat(response.status()).isEqualTo(WorkEntryStatus.REJECTED);
+        assertThat(response.employeeId()).isEqualTo(1L);
+        assertThat(response.employeeName()).isEqualTo("John Doe");
     }
 
     @Test
