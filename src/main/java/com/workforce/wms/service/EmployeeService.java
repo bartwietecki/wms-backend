@@ -2,11 +2,13 @@ package com.workforce.wms.service;
 
 import com.workforce.wms.common.error.EmailAlreadyExistsException;
 import com.workforce.wms.common.error.EmployeeNotFoundException;
+import com.workforce.wms.common.error.InvalidWorkEntryException;
 import com.workforce.wms.dto.employee.CreateEmployeeRequest;
 import com.workforce.wms.dto.employee.EmployeeResponse;
 import com.workforce.wms.dto.employee.UpdateEmployeeRequest;
 import com.workforce.wms.entity.Employee;
 import com.workforce.wms.repository.EmployeeRepository;
+import com.workforce.wms.repository.WorkEntryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,9 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final WorkEntryRepository workEntryRepository;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, WorkEntryRepository workEntryRepository) {
         this.employeeRepository = employeeRepository;
+        this.workEntryRepository = workEntryRepository;
     }
 
     @Transactional(readOnly = true)
@@ -60,6 +64,16 @@ public class EmployeeService {
 
     public EmployeeResponse deactivate(Long id) {
         return setActive(id, false);
+    }
+
+    public void delete(Long id) {
+        Employee employee = getEmployeeOrThrow(id);
+        if (workEntryRepository.existsByEmployeeId(id)) {
+            throw new InvalidWorkEntryException(
+                    "Cannot delete employee with existing work entries. Deactivate instead."
+            );
+        }
+        employeeRepository.delete(employee);
     }
 
     private EmployeeResponse setActive(Long id, boolean isActive) {

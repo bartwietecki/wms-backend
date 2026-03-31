@@ -2,10 +2,12 @@ package com.workforce.wms.service;
 
 import com.workforce.wms.common.error.EmailAlreadyExistsException;
 import com.workforce.wms.common.error.EmployeeNotFoundException;
+import com.workforce.wms.common.error.InvalidWorkEntryException;
 import com.workforce.wms.dto.employee.CreateEmployeeRequest;
 import com.workforce.wms.dto.employee.UpdateEmployeeRequest;
 import com.workforce.wms.entity.Employee;
 import com.workforce.wms.repository.EmployeeRepository;
+import com.workforce.wms.repository.WorkEntryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,9 @@ class EmployeeServiceTest {
 
     @Mock
     EmployeeRepository employeeRepository;
+
+    @Mock
+    WorkEntryRepository workEntryRepository;
 
     @InjectMocks
     private EmployeeService employeeService;
@@ -150,6 +155,38 @@ class EmployeeServiceTest {
         assertThat(response.firstName()).isEqualTo("John2");
         assertThat(response.lastName()).isEqualTo("Doe2");
         assertThat(response.email()).isEqualTo("johndoe@gmail.com");
+    }
+
+    @Test
+    void delete_shouldDeleteEmployee_whenNoWorkEntries() {
+        when(employeeRepository.findById(2L)).thenReturn(Optional.of(existingEmployee));
+        when(workEntryRepository.existsByEmployeeId(2L)).thenReturn(false);
+
+        employeeService.delete(2L);
+
+        verify(employeeRepository).delete(existingEmployee);
+    }
+
+    @Test
+    void delete_whenEmployeeHasWorkEntries_shouldThrow() {
+        when(employeeRepository.findById(2L)).thenReturn(Optional.of(existingEmployee));
+        when(workEntryRepository.existsByEmployeeId(2L)).thenReturn(true);
+
+        assertThatThrownBy(() -> employeeService.delete(2L))
+                .isInstanceOf(InvalidWorkEntryException.class)
+                .hasMessageContaining("Cannot delete employee with existing work entries");
+
+        verify(employeeRepository, never()).delete(any(Employee.class));
+    }
+
+    @Test
+    void delete_whenEmployeeNotFound_shouldThrow() {
+        when(employeeRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> employeeService.delete(999L))
+                .isInstanceOf(EmployeeNotFoundException.class);
+
+        verify(employeeRepository, never()).delete(any(Employee.class));
     }
 
     @Test

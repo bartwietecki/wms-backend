@@ -56,4 +56,10 @@ public class AdminEmployeeController {
         return employeeService.deactivate(id);
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteEmployee(@PathVariable Long id) {
+        employeeService.delete(id);
+    }
+    
 }
