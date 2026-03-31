@@ -115,8 +115,12 @@ public class WorkEntryService {
     }
 
     private WorkEntryResponse toResponse(WorkEntry workEntry) {
+        Employee employee = workEntry.getEmployee();
+        String employeeName = employee.getFirstName() + " " + employee.getLastName();
         return new WorkEntryResponse(
                 workEntry.getId(),
+                employee.getId(),
+                employeeName,
                 workEntry.getWorkDate(),
                 workEntry.getMinutes(),
                 workEntry.getDescription(),
