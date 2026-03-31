@@ -1,7 +1,9 @@
 package com.workforce.wms.api.admin;
 
+import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.service.WorkEntryService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,6 +21,12 @@ public class AdminWorkEntryController {
     @GetMapping
     public List<WorkEntryResponse> getAll() {
         return workEntryService.findAll();
+    }
+
+    @PutMapping("/{id}")
+    public WorkEntryResponse update(@PathVariable Long id,
+                                    @Valid @RequestBody UpdateWorkEntryRequest request) {
+        return workEntryService.update(id, request);
     }
 
     @PostMapping("/{id}/approve")
