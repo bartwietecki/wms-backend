@@ -1,5 +1,6 @@
 package com.workforce.wms.dto.employee;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -14,9 +15,16 @@ public record UpdateEmployeeRequest (
     String lastName,
 
     @NotBlank
+    @Email
+    @Size(max = 255)
+    String email,
+
+    @Size(max = 120)
     String position,
 
     @NotBlank
     @Size(max = 30)
-    String employmentType
+    String employmentType,
+
+    boolean active
 ) {}

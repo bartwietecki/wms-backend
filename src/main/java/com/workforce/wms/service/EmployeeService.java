@@ -97,10 +97,16 @@ public class EmployeeService {
     }
 
     private void applyUpdate(Employee employee, UpdateEmployeeRequest request) {
+        if (!employee.getEmail().equalsIgnoreCase(request.email()) &&
+                employeeRepository.existsByEmail(request.email())) {
+            throw new EmailAlreadyExistsException(request.email());
+        }
         employee.setFirstName(request.firstName());
         employee.setLastName(request.lastName());
+        employee.setEmail(request.email());
         employee.setPosition(request.position());
         employee.setEmploymentType(request.employmentType());
+        employee.setActive(request.active());
     }
 
     private EmployeeResponse toResponse(Employee employee) {
