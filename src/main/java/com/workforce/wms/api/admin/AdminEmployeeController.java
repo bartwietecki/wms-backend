@@ -46,16 +46,6 @@ public class AdminEmployeeController {
         return employeeService.update(id, request);
     }
 
-    @PatchMapping("/{id}/activate")
-    public EmployeeResponse activate(@PathVariable Long id) {
-        return employeeService.activate(id);
-    }
-
-    @PatchMapping("/{id}/deactivate")
-    public EmployeeResponse deactivate(@PathVariable Long id) {
-        return employeeService.deactivate(id);
-    }
-
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteEmployee(@PathVariable Long id) {

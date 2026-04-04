@@ -134,42 +134,4 @@ class AdminEmployeeControllerTest {
         verifyNoMoreInteractions(employeeService);
     }
 
-    @Test
-    void activate_shouldDelegateToService() {
-        // given
-        EmployeeResponse response = new EmployeeResponse(
-                2L, "John", "Doe", "johndoe@gmail.com", "Developer", "B2B", true
-        );
-
-        when(employeeService.activate(2L)).thenReturn(response);
-
-        // when
-        EmployeeResponse result = controller.activate(2L);
-
-        // then
-        assertThat(result.active()).isTrue();
-
-        verify(employeeService).activate(2L);
-        verifyNoMoreInteractions(employeeService);
-    }
-
-    @Test
-    void deactivate_shouldDelegateToService() {
-        // given
-        EmployeeResponse response = new EmployeeResponse(
-                2L, "John", "Doe", "johndoe@gmail.com", "Developer", "B2B", false
-        );
-
-        when(employeeService.deactivate(2L)).thenReturn(response);
-
-        // when
-        EmployeeResponse result = controller.deactivate(2L);
-
-        // then
-        assertThat(result.active()).isFalse();
-
-        verify(employeeService).deactivate(2L);
-        verifyNoMoreInteractions(employeeService);
-    }
-
 }

@@ -58,14 +58,6 @@ public class EmployeeService {
         return toResponse(employeeRepository.save(employee));
     }
 
-    public EmployeeResponse activate(Long id) {
-        return setActive(id, true);
-    }
-
-    public EmployeeResponse deactivate(Long id) {
-        return setActive(id, false);
-    }
-
     public void delete(Long id) {
         Employee employee = getEmployeeOrThrow(id);
         if (workEntryRepository.existsByEmployeeId(id)) {
@@ -74,12 +66,6 @@ public class EmployeeService {
             );
         }
         employeeRepository.delete(employee);
-    }
-
-    private EmployeeResponse setActive(Long id, boolean isActive) {
-        Employee employee = getEmployeeOrThrow(id);
-        employee.setActive(isActive);
-        return toResponse(employee);
     }
 
     private Employee getEmployeeOrThrow(Long id) {

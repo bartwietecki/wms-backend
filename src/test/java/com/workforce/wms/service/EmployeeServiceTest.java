@@ -206,21 +206,4 @@ class EmployeeServiceTest {
         verify(employeeRepository, never()).delete(any(Employee.class));
     }
 
-    @Test
-    void activate_shouldSetActiveTrue() {
-        when(employeeRepository.findById(2L)).thenReturn(Optional.of(existingEmployee));
-
-        var response = employeeService.activate(2L);
-
-        assertThat(response.active()).isTrue();
-    }
-
-    @Test
-    void deactivate_shouldSetActiveFalse() {
-        when(employeeRepository.findById(2L)).thenReturn(Optional.of(existingEmployee));
-
-        var response = employeeService.deactivate(2L);
-
-        assertThat(response.active()).isFalse();
-    }
 }
