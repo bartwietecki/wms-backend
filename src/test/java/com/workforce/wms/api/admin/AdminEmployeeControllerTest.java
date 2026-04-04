@@ -113,7 +113,7 @@ class AdminEmployeeControllerTest {
     void updateEmployee_shouldDelegateToService_andReturnResponse() {
         // given
         UpdateEmployeeRequest request = new UpdateEmployeeRequest(
-                "John2", "Doe2", "Senior Developer", "B2B"
+                "John2", "Doe2", "johndoe@gmail.com", "Senior Developer", "B2B", true
         );
 
         EmployeeResponse response = new EmployeeResponse(

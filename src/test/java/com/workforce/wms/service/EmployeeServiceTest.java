@@ -133,9 +133,9 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void update_shouldUpdateFields_andKeepEmail() {
+    void update_shouldUpdateAllFields() {
         UpdateEmployeeRequest request = new UpdateEmployeeRequest(
-                "John2", "Doe2", "Senior Developer", "B2B"
+                "John2", "Doe2", "johndoe@gmail.com", "Senior Developer", "B2B", false
         );
 
         when(employeeRepository.findById(2L)).thenReturn(Optional.of(existingEmployee));
@@ -150,11 +150,28 @@ class EmployeeServiceTest {
         assertThat(saved.getLastName()).isEqualTo("Doe2");
         assertThat(saved.getPosition()).isEqualTo("Senior Developer");
         assertThat(saved.getEmploymentType()).isEqualTo("B2B");
-        assertThat(saved.getEmail()).isEqualTo("johndoe@gmail.com"); // keep unchanged
+        assertThat(saved.getEmail()).isEqualTo("johndoe@gmail.com");
+        assertThat(saved.isActive()).isFalse();
 
         assertThat(response.firstName()).isEqualTo("John2");
         assertThat(response.lastName()).isEqualTo("Doe2");
         assertThat(response.email()).isEqualTo("johndoe@gmail.com");
+        assertThat(response.active()).isFalse();
+    }
+
+    @Test
+    void update_whenEmailChangedToDuplicate_shouldThrow() {
+        UpdateEmployeeRequest request = new UpdateEmployeeRequest(
+                "John", "Doe", "taken@gmail.com", "Developer", "B2B", true
+        );
+
+        when(employeeRepository.findById(2L)).thenReturn(Optional.of(existingEmployee));
+        when(employeeRepository.existsByEmail("taken@gmail.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> employeeService.update(2L, request))
+                .isInstanceOf(EmailAlreadyExistsException.class);
+
+        verify(employeeRepository, never()).save(any(Employee.class));
     }
 
     @Test
