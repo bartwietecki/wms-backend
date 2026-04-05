@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -142,13 +143,13 @@ class WorkEntryServiceTest {
                 .isInstanceOf(InvalidWorkEntryException.class)
                 .hasMessage("from must be <= to");
 
-        verify(workEntryRepository, never()).findFiltered(any(), any(), any(), any(), any());
+        verify(workEntryRepository, never()).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test
     void findAllFiltered_shouldReturnPagedAndMappedResponses() {
         Pageable pageable = PageRequest.of(0, 20);
-        when(workEntryRepository.findFiltered(null, null, null, null, pageable))
+        when(workEntryRepository.findAll(any(Specification.class), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of(pendingWorkEntry)));
 
         var result = workEntryService.findAllFiltered(null, null, null, null, pageable);
@@ -158,19 +159,19 @@ class WorkEntryServiceTest {
         assertThat(result.getContent().getFirst().employeeId()).isEqualTo(1L);
         assertThat(result.getContent().getFirst().employeeName()).isEqualTo("John Doe");
         assertThat(result.getContent().getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
-        verify(workEntryRepository).findFiltered(null, null, null, null, pageable);
+        verify(workEntryRepository).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test
     void findAllFiltered_whenNoEntries_shouldReturnEmptyPage() {
         Pageable pageable = PageRequest.of(0, 20);
-        when(workEntryRepository.findFiltered(null, null, null, null, pageable))
+        when(workEntryRepository.findAll(any(Specification.class), eq(pageable)))
                 .thenReturn(new PageImpl<>(List.of()));
 
         var result = workEntryService.findAllFiltered(null, null, null, null, pageable);
 
         assertThat(result.getTotalElements()).isEqualTo(0);
-        verify(workEntryRepository).findFiltered(null, null, null, null, pageable);
+        verify(workEntryRepository).findAll(any(Specification.class), eq(pageable));
     }
 
     @Test
