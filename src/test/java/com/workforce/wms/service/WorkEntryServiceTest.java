@@ -17,6 +17,9 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -129,32 +132,45 @@ class WorkEntryServiceTest {
     }
 
     @Test
-    void findAll_shouldReturnMappedResponses() {
-        when(workEntryRepository.findAllByOrderByWorkDateDesc())
-                .thenReturn(List.of(pendingWorkEntry));
+    void findAllFiltered_whenFromIsAfterTo_shouldThrow() {
+        Pageable pageable = PageRequest.of(0, 20);
+        LocalDate from = LocalDate.of(2026, 4, 30);
+        LocalDate to = LocalDate.of(2026, 4, 1);
 
-        var result = workEntryService.findAll();
+        assertThatThrownBy(() -> workEntryService.findAllFiltered(
+                null, null, from, to, pageable))
+                .isInstanceOf(InvalidWorkEntryException.class)
+                .hasMessage("from must be <= to");
 
-        assertThat(result).hasSize(1);
-        assertThat(result.getFirst().id()).isEqualTo(10L);
-        assertThat(result.getFirst().employeeId()).isEqualTo(1L);
-        assertThat(result.getFirst().employeeName()).isEqualTo("John Doe");
-        assertThat(result.getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
-        assertThat(result.getFirst().minutes()).isEqualTo(120);
-        assertThat(result.getFirst().description()).isEqualTo("Worked on WMS Project");
-
-        verify(workEntryRepository).findAllByOrderByWorkDateDesc();
+        verify(workEntryRepository, never()).findFiltered(any(), any(), any(), any(), any());
     }
 
     @Test
-    void findAll_whenNoEntries_shouldReturnEmptyList() {
-        when(workEntryRepository.findAllByOrderByWorkDateDesc())
-                .thenReturn(List.of());
+    void findAllFiltered_shouldReturnPagedAndMappedResponses() {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(workEntryRepository.findFiltered(null, null, null, null, pageable))
+                .thenReturn(new PageImpl<>(List.of(pendingWorkEntry)));
 
-        var result = workEntryService.findAll();
+        var result = workEntryService.findAllFiltered(null, null, null, null, pageable);
 
-        assertThat(result).isEmpty();
-        verify(workEntryRepository).findAllByOrderByWorkDateDesc();
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent().getFirst().id()).isEqualTo(10L);
+        assertThat(result.getContent().getFirst().employeeId()).isEqualTo(1L);
+        assertThat(result.getContent().getFirst().employeeName()).isEqualTo("John Doe");
+        assertThat(result.getContent().getFirst().status()).isEqualTo(WorkEntryStatus.PENDING);
+        verify(workEntryRepository).findFiltered(null, null, null, null, pageable);
+    }
+
+    @Test
+    void findAllFiltered_whenNoEntries_shouldReturnEmptyPage() {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(workEntryRepository.findFiltered(null, null, null, null, pageable))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        var result = workEntryService.findAllFiltered(null, null, null, null, pageable);
+
+        assertThat(result.getTotalElements()).isEqualTo(0);
+        verify(workEntryRepository).findFiltered(null, null, null, null, pageable);
     }
 
     @Test
