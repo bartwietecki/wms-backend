@@ -11,8 +11,10 @@ import com.workforce.wms.entity.WorkEntry;
 import com.workforce.wms.entity.WorkEntryStatus;
 import com.workforce.wms.repository.EmployeeRepository;
 import com.workforce.wms.repository.WorkEntryRepository;
+import com.workforce.wms.repository.WorkEntrySpecifications;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,8 +75,13 @@ public class WorkEntryService {
             throw new InvalidWorkEntryException("from must be <= to");
         }
 
-        return workEntryRepository.findFiltered(status, employeeId, from, to, pageable)
-                .map(this::toResponse);
+        Specification<WorkEntry> spec = Specification
+                .where(WorkEntrySpecifications.hasStatus(status))
+                .and(WorkEntrySpecifications.hasEmployeeId(employeeId))
+                .and(WorkEntrySpecifications.workDateFrom(from))
+                .and(WorkEntrySpecifications.workDateTo(to));
+
+        return workEntryRepository.findAll(spec, pageable).map(this::toResponse);
     }
 
     public WorkEntryResponse approve(Long id) {
