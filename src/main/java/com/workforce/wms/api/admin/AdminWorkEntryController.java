@@ -2,12 +2,18 @@ package com.workforce.wms.api.admin;
 
 import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
+import com.workforce.wms.entity.WorkEntryStatus;
 import com.workforce.wms.service.WorkEntryService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/admin/work-entries")
@@ -20,8 +26,14 @@ public class AdminWorkEntryController {
     }
 
     @GetMapping
-    public List<WorkEntryResponse> getAll() {
-        return workEntryService.findAll();
+    public Page<WorkEntryResponse> getAll(
+            @RequestParam(required = false) WorkEntryStatus status,
+            @RequestParam(required = false) Long employeeId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
+            @PageableDefault(size = 20, sort = "workDate", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return workEntryService.findAllFiltered(status, employeeId, from, to, pageable);
     }
 
     @PutMapping("/{id}")
