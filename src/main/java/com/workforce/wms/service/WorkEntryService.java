@@ -11,6 +11,8 @@ import com.workforce.wms.entity.WorkEntry;
 import com.workforce.wms.entity.WorkEntryStatus;
 import com.workforce.wms.repository.EmployeeRepository;
 import com.workforce.wms.repository.WorkEntryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,11 +66,15 @@ public class WorkEntryService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkEntryResponse> findAll() {
-        return workEntryRepository.findAllByOrderByWorkDateDesc()
-                .stream()
-                .map(this::toResponse)
-                .toList();
+    public Page<WorkEntryResponse> findAllFiltered(WorkEntryStatus status, Long employeeId,
+                                                   LocalDate from, LocalDate to, Pageable pageable) {
+
+        if (from != null && to != null && from.isAfter(to)) {
+            throw new InvalidWorkEntryException("from must be <= to");
+        }
+
+        return workEntryRepository.findFiltered(status, employeeId, from, to, pageable)
+                .map(this::toResponse);
     }
 
     public WorkEntryResponse approve(Long id) {
