@@ -134,4 +134,14 @@ class AdminEmployeeControllerTest {
         verifyNoMoreInteractions(employeeService);
     }
 
+    @Test
+    void deleteEmployee_shouldDelegateToService() {
+        doNothing().when(employeeService).delete(2L);
+
+        controller.deleteEmployee(2L);
+
+        verify(employeeService).delete(2L);
+        verifyNoMoreInteractions(employeeService);
+    }
+
 }
