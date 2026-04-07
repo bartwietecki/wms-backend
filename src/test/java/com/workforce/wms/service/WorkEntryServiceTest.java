@@ -110,6 +110,33 @@ class WorkEntryServiceTest {
     }
 
     @Test
+    void myEntries_whenFromIsAfterTo_shouldThrow() {
+        assertThatThrownBy(() -> workEntryService.myEntries(
+                1L,
+                LocalDate.of(2026, 3, 31),
+                LocalDate.of(2026, 3, 1)))
+                .isInstanceOf(InvalidWorkEntryException.class)
+                .hasMessage("from must be <= to");
+
+        verify(workEntryRepository, never())
+                .findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(any(), any(), any());
+    }
+
+    @Test
+    void create_whenEmployeeNotFound_shouldThrow() {
+        CreateWorkEntryRequest request = new CreateWorkEntryRequest(
+                LocalDate.of(2026, 3, 13), 120, "desc"
+        );
+
+        when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> workEntryService.create(99L, request))
+                .isInstanceOf(com.workforce.wms.common.error.EmployeeNotFoundException.class);
+
+        verify(workEntryRepository, never()).save(any(WorkEntry.class));
+    }
+
+    @Test
     void myEntries_whenValidRange_shouldReturnMappedResponses() {
         when(workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(
                 1L,
