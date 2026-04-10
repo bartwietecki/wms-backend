@@ -1,9 +1,12 @@
 package com.workforce.wms.api.employee;
 
 import com.workforce.wms.dto.workentry.CreateWorkEntryRequest;
+import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.service.WorkEntryService;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -34,5 +37,23 @@ public class WorkEntryController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to
     ) {
         return workEntryService.myEntries(employeeId, from, to);
+    }
+
+    @PutMapping("/{id}")
+    public WorkEntryResponse update(
+            @RequestHeader("X-EMPLOYEE-ID") Long employeeId,
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateWorkEntryRequest request
+    ) {
+        return workEntryService.updateOwnEntry(employeeId, id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
+            @RequestHeader("X-EMPLOYEE-ID") Long employeeId,
+            @PathVariable Long id
+    ) {
+        workEntryService.deleteOwnEntry(employeeId, id);
     }
 }

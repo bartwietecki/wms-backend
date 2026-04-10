@@ -2,6 +2,7 @@ package com.workforce.wms.service;
 
 import com.workforce.wms.common.error.EmployeeNotFoundException;
 import com.workforce.wms.common.error.InvalidWorkEntryException;
+import com.workforce.wms.common.error.WorkEntryAccessDeniedException;
 import com.workforce.wms.common.error.WorkEntryNotFoundException;
 import com.workforce.wms.dto.workentry.CreateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
@@ -119,11 +120,41 @@ public class WorkEntryService {
         return toResponse(workEntryRepository.save(workEntry));
     }
 
+    public WorkEntryResponse updateOwnEntry(Long employeeId, Long workEntryId, UpdateWorkEntryRequest request) {
+        WorkEntry workEntry = workEntryRepository.findById(workEntryId)
+                .orElseThrow(() -> new WorkEntryNotFoundException(workEntryId));
+
+        if (!workEntry.getEmployee().getId().equals(employeeId)) {
+            throw new WorkEntryAccessDeniedException(workEntryId);
+        }
+
+        validatePending(workEntry);
+
+        workEntry.setWorkDate(request.workDate());
+        workEntry.setMinutes(request.minutes());
+        workEntry.setDescription(trimToNull(request.description()));
+
+        return toResponse(workEntryRepository.save(workEntry));
+    }
+
     public void delete(Long id) {
         if (!workEntryRepository.existsById(id)) {
             throw new WorkEntryNotFoundException(id);
         }
         workEntryRepository.deleteById(id);
+    }
+
+    public void deleteOwnEntry(Long employeeId, Long workEntryId) {
+        WorkEntry workEntry = workEntryRepository.findById(workEntryId)
+                .orElseThrow(() -> new WorkEntryNotFoundException(workEntryId));
+
+        if (!workEntry.getEmployee().getId().equals(employeeId)) {
+            throw new WorkEntryAccessDeniedException(workEntryId);
+        }
+
+        validatePending(workEntry);
+
+        workEntryRepository.deleteById(workEntryId);
     }
 
     private void validateCreateRequest(CreateWorkEntryRequest request) {
