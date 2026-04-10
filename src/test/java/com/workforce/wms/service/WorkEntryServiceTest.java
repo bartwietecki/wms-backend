@@ -1,6 +1,7 @@
 package com.workforce.wms.service;
 
 import com.workforce.wms.common.error.InvalidWorkEntryException;
+import com.workforce.wms.common.error.WorkEntryAccessDeniedException;
 import com.workforce.wms.common.error.WorkEntryNotFoundException;
 import com.workforce.wms.dto.workentry.CreateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
@@ -258,6 +259,100 @@ class WorkEntryServiceTest {
                 .isInstanceOf(WorkEntryNotFoundException.class);
 
         verify(workEntryRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void updateOwnEntry_shouldUpdateFieldsWhenOwnerAndPending() {
+        UpdateWorkEntryRequest request = new UpdateWorkEntryRequest(
+                LocalDate.of(2026, 4, 1), 90, "Updated"
+        );
+        when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
+        when(workEntryRepository.save(any(WorkEntry.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        var response = workEntryService.updateOwnEntry(1L, 10L, request);
+
+        assertThat(response.minutes()).isEqualTo(90);
+        assertThat(response.workDate()).isEqualTo(LocalDate.of(2026, 4, 1));
+        verify(workEntryRepository).save(any(WorkEntry.class));
+    }
+
+    @Test
+    void updateOwnEntry_whenNotOwner_shouldThrowAccessDenied() {
+        when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
+
+        UpdateWorkEntryRequest request = new UpdateWorkEntryRequest(
+                LocalDate.of(2026, 4, 1), 90, "Updated"
+        );
+
+        assertThatThrownBy(() -> workEntryService.updateOwnEntry(99L, 10L, request))
+                .isInstanceOf(WorkEntryAccessDeniedException.class);
+
+        verify(workEntryRepository, never()).save(any(WorkEntry.class));
+    }
+
+    @Test
+    void updateOwnEntry_whenNotPending_shouldThrow() {
+        pendingWorkEntry.setStatus(WorkEntryStatus.APPROVED);
+        when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
+
+        UpdateWorkEntryRequest request = new UpdateWorkEntryRequest(
+                LocalDate.of(2026, 4, 1), 90, "Updated"
+        );
+
+        assertThatThrownBy(() -> workEntryService.updateOwnEntry(1L, 10L, request))
+                .isInstanceOf(InvalidWorkEntryException.class);
+
+        verify(workEntryRepository, never()).save(any(WorkEntry.class));
+    }
+
+    @Test
+    void updateOwnEntry_whenNotFound_shouldThrow() {
+        when(workEntryRepository.findById(999L)).thenReturn(Optional.empty());
+
+        UpdateWorkEntryRequest request = new UpdateWorkEntryRequest(
+                LocalDate.of(2026, 4, 1), 90, "Updated"
+        );
+
+        assertThatThrownBy(() -> workEntryService.updateOwnEntry(1L, 999L, request))
+                .isInstanceOf(WorkEntryNotFoundException.class);
+    }
+
+    @Test
+    void deleteOwnEntry_shouldDeleteWhenOwnerAndPending() {
+        when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
+
+        workEntryService.deleteOwnEntry(1L, 10L);
+
+        verify(workEntryRepository).deleteById(10L);
+    }
+
+    @Test
+    void deleteOwnEntry_whenNotOwner_shouldThrowAccessDenied() {
+        when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
+
+        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(99L, 10L))
+                .isInstanceOf(WorkEntryAccessDeniedException.class);
+
+        verify(workEntryRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void deleteOwnEntry_whenNotPending_shouldThrow() {
+        pendingWorkEntry.setStatus(WorkEntryStatus.REJECTED);
+        when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
+
+        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(1L, 10L))
+                .isInstanceOf(InvalidWorkEntryException.class);
+
+        verify(workEntryRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void deleteOwnEntry_whenNotFound_shouldThrow() {
+        when(workEntryRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(1L, 999L))
+                .isInstanceOf(WorkEntryNotFoundException.class);
     }
 
     @Test

@@ -71,4 +71,14 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
+
+    @ExceptionHandler(WorkEntryAccessDeniedException.class)
+    public ResponseEntity<ApiError> handleWorkEntryAccessDenied(WorkEntryAccessDeniedException ex) {
+        ApiError body = new ApiError(
+                "WORK_ENTRY_ACCESS_DENIED",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
 }
