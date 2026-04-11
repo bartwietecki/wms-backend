@@ -27,6 +27,7 @@ public class Employee {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
+    // Legacy string field kept for backward compatibility during transition
     @Column(length = 120)
     private String position;
 
@@ -35,6 +36,20 @@ public class Employee {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    // ManyToOne because in the future one user account
+    // could potentially manage multiple employee profiles (e.g. contractor roles).
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
+    private Department department;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position_id")
+    private Position positionEntity;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private OffsetDateTime createdAt;
@@ -53,5 +68,4 @@ public class Employee {
     void onUpdate() {
         this.updatedAt = OffsetDateTime.now();
     }
-
 }
