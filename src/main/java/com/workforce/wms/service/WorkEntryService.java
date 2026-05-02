@@ -8,6 +8,7 @@ import com.workforce.wms.dto.workentry.CreateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.entity.Employee;
+import com.workforce.wms.entity.User;
 import com.workforce.wms.entity.WorkEntry;
 import com.workforce.wms.entity.WorkEntryStatus;
 import com.workforce.wms.repository.EmployeeRepository;
@@ -28,10 +29,15 @@ public class WorkEntryService {
 
     private final WorkEntryRepository workEntryRepository;
     private final EmployeeRepository employeeRepository;
+    private final WorkEntryStatusHistoryService historyService;
+    private final CurrentUserService currentUserService;
 
-    public WorkEntryService(WorkEntryRepository workEntryRepository, EmployeeRepository employeeRepository) {
+    public WorkEntryService(WorkEntryRepository workEntryRepository, EmployeeRepository employeeRepository,
+                            WorkEntryStatusHistoryService historyService, CurrentUserService currentUserService) {
         this.workEntryRepository = workEntryRepository;
         this.employeeRepository = employeeRepository;
+        this.historyService = historyService;
+        this.currentUserService = currentUserService;
     }
 
     @Transactional
@@ -91,20 +97,28 @@ public class WorkEntryService {
 
         validatePending(workEntry);
 
+        WorkEntryStatus oldStatus = workEntry.getStatus();
         workEntry.setStatus(WorkEntryStatus.APPROVED);
         WorkEntry saved = workEntryRepository.save(workEntry);
+
+        User currentUser = currentUserService.getCurrentUser().orElse(null);
+        historyService.saveStatusChange(saved, oldStatus, WorkEntryStatus.APPROVED, currentUser, null);
 
         return toResponse(saved);
     }
 
-    public WorkEntryResponse reject(Long id) {
+    public WorkEntryResponse reject(Long id, String reason) {
         WorkEntry workEntry = workEntryRepository.findById(id)
                 .orElseThrow(() -> new WorkEntryNotFoundException(id));
 
         validatePending(workEntry);
 
+        WorkEntryStatus oldStatus = workEntry.getStatus();
         workEntry.setStatus(WorkEntryStatus.REJECTED);
         WorkEntry saved = workEntryRepository.save(workEntry);
+
+        User currentUser = currentUserService.getCurrentUser().orElse(null);
+        historyService.saveStatusChange(saved, oldStatus, WorkEntryStatus.REJECTED, currentUser, reason);
 
         return toResponse(saved);
     }
