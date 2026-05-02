@@ -39,6 +39,12 @@ class WorkEntryServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
 
+    @Mock
+    private WorkEntryStatusHistoryService historyService;
+
+    @Mock
+    private CurrentUserService currentUserService;
+
     @InjectMocks
     private WorkEntryService workEntryService;
 
@@ -359,6 +365,7 @@ class WorkEntryServiceTest {
     void approve_whenStatusIsPending_shouldSetApproved() {
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
         when(workEntryRepository.save(any(WorkEntry.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(currentUserService.getCurrentUser()).thenReturn(Optional.empty());
 
         var response = workEntryService.approve(10L);
 
@@ -375,8 +382,9 @@ class WorkEntryServiceTest {
     void reject_whenStatusIsPending_shouldSetRejected() {
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
         when(workEntryRepository.save(any(WorkEntry.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(currentUserService.getCurrentUser()).thenReturn(Optional.empty());
 
-        var response = workEntryService.reject(10L);
+        var response = workEntryService.reject(10L, "Description is too vague");
 
         verify(workEntryRepository).save(workEntryCaptor.capture());
         WorkEntry saved = workEntryCaptor.getValue();
@@ -404,7 +412,7 @@ class WorkEntryServiceTest {
         pendingWorkEntry.setStatus(WorkEntryStatus.REJECTED);
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
 
-        assertThatThrownBy(() -> workEntryService.reject(10L))
+        assertThatThrownBy(() -> workEntryService.reject(10L, "some reason"))
                 .isInstanceOf(InvalidWorkEntryException.class)
                 .hasMessage("Only PENDING work entry can be changed. Current status: REJECTED");
 
@@ -423,7 +431,7 @@ class WorkEntryServiceTest {
     void reject_whenWorkEntryDoesNotExist_shouldThrow() {
         when(workEntryRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> workEntryService.reject(999L))
+        assertThatThrownBy(() -> workEntryService.reject(999L, "some reason"))
                 .isInstanceOf(WorkEntryNotFoundException.class);
     }
 }

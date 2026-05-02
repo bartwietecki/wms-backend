@@ -1,9 +1,11 @@
 package com.workforce.wms.api.admin;
 
+import com.workforce.wms.dto.workentry.RejectWorkEntryRequest;
 import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.dto.workentry.WorkEntryResponse;
 import com.workforce.wms.entity.WorkEntryStatus;
 import com.workforce.wms.service.WorkEntryService;
+import com.workforce.wms.service.WorkEntryStatusHistoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,9 @@ class AdminWorkEntryControllerTest {
     @Mock
     WorkEntryService workEntryService;
 
+    @Mock
+    WorkEntryStatusHistoryService historyService;
+
     @Captor
     ArgumentCaptor<UpdateWorkEntryRequest> updateCaptor;
 
@@ -41,7 +46,7 @@ class AdminWorkEntryControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new AdminWorkEntryController(workEntryService);
+        controller = new AdminWorkEntryController(workEntryService, historyService);
     }
 
     @Test
@@ -99,12 +104,13 @@ class AdminWorkEntryControllerTest {
                 LocalDate.of(2026, 3, 13), 120,
                 "Worked on WMS", WorkEntryStatus.REJECTED
         );
-        when(workEntryService.reject(10L)).thenReturn(rejected);
+        RejectWorkEntryRequest request = new RejectWorkEntryRequest("Description is too vague");
+        when(workEntryService.reject(10L, "Description is too vague")).thenReturn(rejected);
 
-        var result = controller.reject(10L);
+        var result = controller.reject(10L, request);
 
         assertThat(result.status()).isEqualTo(WorkEntryStatus.REJECTED);
-        verify(workEntryService).reject(10L);
+        verify(workEntryService).reject(10L, "Description is too vague");
         verifyNoMoreInteractions(workEntryService);
     }
 
