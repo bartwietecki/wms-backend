@@ -28,7 +28,19 @@ wms:
       username: ${WMS_ADMIN_USERNAME}
       password: ${WMS_ADMIN_PASSWORD}
     employees:
-      - username: ${WMS_EMPLOYEE_USERNAME}
+      - username: jan.kowalski
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: anna.nowak
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: piotr.wisniewski
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: karolina.wojcik
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: michal.kaminski
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: zuzanna.lewandowska
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: natalia.szymanska
         password: ${WMS_EMPLOYEE_PASSWORD}
 
 
