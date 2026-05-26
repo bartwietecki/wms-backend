@@ -1,6 +1,5 @@
 package com.workforce.wms.service;
 
-import com.workforce.wms.common.error.EmployeeNotFoundException;
 import com.workforce.wms.common.error.InvalidWorkEntryException;
 import com.workforce.wms.common.error.WorkEntryAccessDeniedException;
 import com.workforce.wms.common.error.WorkEntryNotFoundException;
@@ -11,7 +10,6 @@ import com.workforce.wms.entity.Employee;
 import com.workforce.wms.entity.User;
 import com.workforce.wms.entity.WorkEntry;
 import com.workforce.wms.entity.WorkEntryStatus;
-import com.workforce.wms.repository.EmployeeRepository;
 import com.workforce.wms.repository.WorkEntryRepository;
 import com.workforce.wms.repository.WorkEntrySpecifications;
 import org.springframework.data.domain.Page;
@@ -28,24 +26,20 @@ import java.util.List;
 public class WorkEntryService {
 
     private final WorkEntryRepository workEntryRepository;
-    private final EmployeeRepository employeeRepository;
     private final WorkEntryStatusHistoryService historyService;
     private final CurrentUserService currentUserService;
 
-    public WorkEntryService(WorkEntryRepository workEntryRepository, EmployeeRepository employeeRepository,
-                            WorkEntryStatusHistoryService historyService, CurrentUserService currentUserService) {
+    public WorkEntryService(WorkEntryRepository workEntryRepository,
+                            WorkEntryStatusHistoryService historyService,
+                            CurrentUserService currentUserService) {
         this.workEntryRepository = workEntryRepository;
-        this.employeeRepository = employeeRepository;
         this.historyService = historyService;
         this.currentUserService = currentUserService;
     }
 
     @Transactional
-    public WorkEntryResponse create(Long employeeId, CreateWorkEntryRequest request) {
+    public WorkEntryResponse create(Employee employee, CreateWorkEntryRequest request) {
         validateCreateRequest(request);
-
-        Employee employee = employeeRepository.findById(employeeId)
-                .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
         WorkEntry workEntry = new WorkEntry();
         workEntry.setEmployee(employee);
@@ -60,7 +54,7 @@ public class WorkEntryService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkEntryResponse> myEntries(Long employeeId, LocalDate from, LocalDate to) {
+    public List<WorkEntryResponse> myEntries(Employee employee, LocalDate from, LocalDate to) {
         if (from == null || to == null) {
             throw new InvalidWorkEntryException("from/to cannot be null");
         }
@@ -68,7 +62,7 @@ public class WorkEntryService {
             throw new InvalidWorkEntryException("from must be <= to");
         }
 
-        return workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(employeeId, from, to)
+        return workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(employee.getId(), from, to)
                 .stream()
                 .map(this::toResponse)
                 .toList();
@@ -134,11 +128,11 @@ public class WorkEntryService {
         return toResponse(workEntryRepository.save(workEntry));
     }
 
-    public WorkEntryResponse updateOwnEntry(Long employeeId, Long workEntryId, UpdateWorkEntryRequest request) {
+    public WorkEntryResponse updateOwnEntry(Employee employee, Long workEntryId, UpdateWorkEntryRequest request) {
         WorkEntry workEntry = workEntryRepository.findById(workEntryId)
                 .orElseThrow(() -> new WorkEntryNotFoundException(workEntryId));
 
-        if (!workEntry.getEmployee().getId().equals(employeeId)) {
+        if (!workEntry.getEmployee().getId().equals(employee.getId())) {
             throw new WorkEntryAccessDeniedException(workEntryId);
         }
 
@@ -158,11 +152,11 @@ public class WorkEntryService {
         workEntryRepository.deleteById(id);
     }
 
-    public void deleteOwnEntry(Long employeeId, Long workEntryId) {
+    public void deleteOwnEntry(Employee employee, Long workEntryId) {
         WorkEntry workEntry = workEntryRepository.findById(workEntryId)
                 .orElseThrow(() -> new WorkEntryNotFoundException(workEntryId));
 
-        if (!workEntry.getEmployee().getId().equals(employeeId)) {
+        if (!workEntry.getEmployee().getId().equals(employee.getId())) {
             throw new WorkEntryAccessDeniedException(workEntryId);
         }
 

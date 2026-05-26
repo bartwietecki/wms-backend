@@ -8,7 +8,6 @@ import com.workforce.wms.dto.workentry.UpdateWorkEntryRequest;
 import com.workforce.wms.entity.Employee;
 import com.workforce.wms.entity.WorkEntry;
 import com.workforce.wms.entity.WorkEntryStatus;
-import com.workforce.wms.repository.EmployeeRepository;
 import com.workforce.wms.repository.WorkEntryRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,9 +36,6 @@ class WorkEntryServiceTest {
     private WorkEntryRepository workEntryRepository;
 
     @Mock
-    private EmployeeRepository employeeRepository;
-
-    @Mock
     private WorkEntryStatusHistoryService historyService;
 
     @Mock
@@ -52,6 +48,7 @@ class WorkEntryServiceTest {
     private ArgumentCaptor<WorkEntry> workEntryCaptor;
 
     private Employee employee;
+    private Employee otherEmployee;
     private WorkEntry pendingWorkEntry;
 
     @BeforeEach
@@ -61,6 +58,9 @@ class WorkEntryServiceTest {
         employee.setFirstName("John");
         employee.setLastName("Doe");
         employee.setEmail("john.doe@gmail.com");
+
+        otherEmployee = new Employee();
+        otherEmployee.setId(99L);
 
         pendingWorkEntry = new WorkEntry();
         pendingWorkEntry.setId(10L);
@@ -79,10 +79,9 @@ class WorkEntryServiceTest {
                 "Worked on WMS Project"
         );
 
-        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(workEntryRepository.save(any(WorkEntry.class))).thenReturn(pendingWorkEntry);
 
-        var response = workEntryService.create(1L, request);
+        var response = workEntryService.create(employee, request);
 
         verify(workEntryRepository).save(workEntryCaptor.capture());
         WorkEntry toSave = workEntryCaptor.getValue();
@@ -108,18 +107,17 @@ class WorkEntryServiceTest {
                 "Worked on WMS Project"
         );
 
-        assertThatThrownBy(() -> workEntryService.create(1L, request))
+        assertThatThrownBy(() -> workEntryService.create(employee, request))
                 .isInstanceOf(InvalidWorkEntryException.class)
                 .hasMessage("minutes must be > 0");
 
-        verify(employeeRepository, never()).findById(anyLong());
         verify(workEntryRepository, never()).save(any(WorkEntry.class));
     }
 
     @Test
     void myEntries_whenFromIsAfterTo_shouldThrow() {
         assertThatThrownBy(() -> workEntryService.myEntries(
-                1L,
+                employee,
                 LocalDate.of(2026, 3, 31),
                 LocalDate.of(2026, 3, 1)))
                 .isInstanceOf(InvalidWorkEntryException.class)
@@ -130,29 +128,15 @@ class WorkEntryServiceTest {
     }
 
     @Test
-    void create_whenEmployeeNotFound_shouldThrow() {
-        CreateWorkEntryRequest request = new CreateWorkEntryRequest(
-                LocalDate.of(2026, 3, 13), 120, "desc"
-        );
-
-        when(employeeRepository.findById(99L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> workEntryService.create(99L, request))
-                .isInstanceOf(com.workforce.wms.common.error.EmployeeNotFoundException.class);
-
-        verify(workEntryRepository, never()).save(any(WorkEntry.class));
-    }
-
-    @Test
     void myEntries_whenValidRange_shouldReturnMappedResponses() {
         when(workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(
                 1L,
                 LocalDate.of(2026, 3, 1),
                 LocalDate.of(2026, 3, 31)
-                )).thenReturn(List.of(pendingWorkEntry));
+        )).thenReturn(List.of(pendingWorkEntry));
 
         var result = workEntryService.myEntries(
-                1L,
+                employee,
                 LocalDate.of(2026, 3, 1),
                 LocalDate.of(2026, 3, 31)
         );
@@ -275,7 +259,7 @@ class WorkEntryServiceTest {
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
         when(workEntryRepository.save(any(WorkEntry.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        var response = workEntryService.updateOwnEntry(1L, 10L, request);
+        var response = workEntryService.updateOwnEntry(employee, 10L, request);
 
         assertThat(response.minutes()).isEqualTo(90);
         assertThat(response.workDate()).isEqualTo(LocalDate.of(2026, 4, 1));
@@ -290,7 +274,7 @@ class WorkEntryServiceTest {
                 LocalDate.of(2026, 4, 1), 90, "Updated"
         );
 
-        assertThatThrownBy(() -> workEntryService.updateOwnEntry(99L, 10L, request))
+        assertThatThrownBy(() -> workEntryService.updateOwnEntry(otherEmployee, 10L, request))
                 .isInstanceOf(WorkEntryAccessDeniedException.class);
 
         verify(workEntryRepository, never()).save(any(WorkEntry.class));
@@ -305,7 +289,7 @@ class WorkEntryServiceTest {
                 LocalDate.of(2026, 4, 1), 90, "Updated"
         );
 
-        assertThatThrownBy(() -> workEntryService.updateOwnEntry(1L, 10L, request))
+        assertThatThrownBy(() -> workEntryService.updateOwnEntry(employee, 10L, request))
                 .isInstanceOf(InvalidWorkEntryException.class);
 
         verify(workEntryRepository, never()).save(any(WorkEntry.class));
@@ -319,7 +303,7 @@ class WorkEntryServiceTest {
                 LocalDate.of(2026, 4, 1), 90, "Updated"
         );
 
-        assertThatThrownBy(() -> workEntryService.updateOwnEntry(1L, 999L, request))
+        assertThatThrownBy(() -> workEntryService.updateOwnEntry(employee, 999L, request))
                 .isInstanceOf(WorkEntryNotFoundException.class);
     }
 
@@ -327,7 +311,7 @@ class WorkEntryServiceTest {
     void deleteOwnEntry_shouldDeleteWhenOwnerAndPending() {
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
 
-        workEntryService.deleteOwnEntry(1L, 10L);
+        workEntryService.deleteOwnEntry(employee, 10L);
 
         verify(workEntryRepository).deleteById(10L);
     }
@@ -336,7 +320,7 @@ class WorkEntryServiceTest {
     void deleteOwnEntry_whenNotOwner_shouldThrowAccessDenied() {
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
 
-        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(99L, 10L))
+        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(otherEmployee, 10L))
                 .isInstanceOf(WorkEntryAccessDeniedException.class);
 
         verify(workEntryRepository, never()).deleteById(anyLong());
@@ -347,7 +331,7 @@ class WorkEntryServiceTest {
         pendingWorkEntry.setStatus(WorkEntryStatus.REJECTED);
         when(workEntryRepository.findById(10L)).thenReturn(Optional.of(pendingWorkEntry));
 
-        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(1L, 10L))
+        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(employee, 10L))
                 .isInstanceOf(InvalidWorkEntryException.class);
 
         verify(workEntryRepository, never()).deleteById(anyLong());
@@ -357,7 +341,7 @@ class WorkEntryServiceTest {
     void deleteOwnEntry_whenNotFound_shouldThrow() {
         when(workEntryRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(1L, 999L))
+        assertThatThrownBy(() -> workEntryService.deleteOwnEntry(employee, 999L))
                 .isInstanceOf(WorkEntryNotFoundException.class);
     }
 
