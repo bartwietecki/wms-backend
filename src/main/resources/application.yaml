@@ -27,8 +27,8 @@ wms:
     admin:
       username: ${WMS_ADMIN_USERNAME}
       password: ${WMS_ADMIN_PASSWORD}
-    employee:
-      username: ${WMS_EMPLOYEE_USERNAME}
-      password: ${WMS_EMPLOYEE_PASSWORD}
+    employees:
+      - username: ${WMS_EMPLOYEE_USERNAME}
+        password: ${WMS_EMPLOYEE_PASSWORD}
 
 

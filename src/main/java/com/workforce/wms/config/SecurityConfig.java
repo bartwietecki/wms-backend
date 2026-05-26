@@ -14,6 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -60,16 +61,20 @@ public class SecurityConfig {
 
     @Bean
     public InMemoryUserDetailsManager userDetailsService(WmsSecurityProperties props) {
-        UserDetails admin = User.withUsername(props.admin().username())
+        List<UserDetails> users = new ArrayList<>();
+
+        users.add(User.withUsername(props.admin().username())
                 .password("{noop}" + props.admin().password())
                 .roles(ROLE_ADMIN)
-                .build();
+                .build());
 
-        UserDetails employee = User.withUsername(props.employee().username())
-                .password("{noop}" + props.employee().password())
-                .roles(ROLE_EMPLOYEE)
-                .build();
+        for (WmsSecurityProperties.User emp : props.employees()) {
+            users.add(User.withUsername(emp.username())
+                    .password("{noop}" + emp.password())
+                    .roles(ROLE_EMPLOYEE)
+                    .build());
+        }
 
-        return new InMemoryUserDetailsManager(admin, employee);
+        return new InMemoryUserDetailsManager(users);
     }
 }
