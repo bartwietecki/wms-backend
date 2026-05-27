@@ -32,6 +32,9 @@ management:
         include: health,info
 
 wms:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
   security:
     admin:
       username: ${WMS_ADMIN_USERNAME}
