@@ -16,6 +16,15 @@ spring:
   flyway:
     enabled: true
 
+  # JWT / OAuth2 Resource Server — uncomment to activate JWT Bearer authentication
+  # alongside existing Basic Auth. Requires a running OpenID Connect provider (e.g. Keycloak).
+  #
+  # security:
+  #   oauth2:
+  #     resourceserver:
+  #       jwt:
+  #         issuer-uri: http://localhost:8080/realms/wms
+
 management:
   endpoints:
     web:
@@ -23,12 +32,27 @@ management:
         include: health,info
 
 wms:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
   security:
     admin:
       username: ${WMS_ADMIN_USERNAME}
       password: ${WMS_ADMIN_PASSWORD}
-    employee:
-      username: ${WMS_EMPLOYEE_USERNAME}
-      password: ${WMS_EMPLOYEE_PASSWORD}
+    employees:
+      - username: jan.kowalski
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: anna.nowak
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: piotr.wisniewski
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: karolina.wojcik
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: michal.kaminski
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: zuzanna.lewandowska
+        password: ${WMS_EMPLOYEE_PASSWORD}
+      - username: natalia.szymanska
+        password: ${WMS_EMPLOYEE_PASSWORD}
 
 
