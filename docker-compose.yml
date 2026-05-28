@@ -29,12 +29,22 @@ services:
       WMS_ADMIN_USERNAME: ${WMS_ADMIN_USERNAME}
       WMS_ADMIN_PASSWORD: ${WMS_ADMIN_PASSWORD}
       WMS_EMPLOYEE_PASSWORD: ${WMS_EMPLOYEE_PASSWORD}
-      WMS_CORS_ALLOWED_ORIGINS: http://localhost:5173
+      WMS_CORS_ALLOWED_ORIGINS: http://localhost:5173,http://localhost:3000
     ports:
       - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - wms-net
+
+  wms-frontend:
+    build: ../wms-frontend
+    container_name: wms-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - wms-backend
     networks:
       - wms-net
 
