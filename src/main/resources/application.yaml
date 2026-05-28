@@ -16,14 +16,17 @@ spring:
   flyway:
     enabled: true
 
-  # JWT / OAuth2 Resource Server — uncomment to activate JWT Bearer authentication
-  # alongside existing Basic Auth. Requires a running OpenID Connect provider (e.g. Keycloak).
-  #
-  # security:
-  #   oauth2:
-  #     resourceserver:
-  #       jwt:
-  #         issuer-uri: http://localhost:8080/realms/wms
+  # JWT / OAuth2 Resource Server — active when WMS_JWT_ISSUER_URI / WMS_JWT_JWK_SET_URI are set.
+  # Both properties must be configured together:
+  #   issuer-uri  — the public URL embedded as `iss` in Keycloak tokens (claim validation only, no OIDC discovery)
+  #   jwk-set-uri — where to fetch public signing keys (uses Docker-internal hostname in Compose)
+  # Defaults work when running the backend locally with Keycloak exposed on localhost:9090.
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${WMS_JWT_ISSUER_URI:http://localhost:9090/realms/wms}
+          jwk-set-uri: ${WMS_JWT_JWK_SET_URI:http://localhost:9090/realms/wms/protocol/openid-connect/certs}
 
 management:
   endpoints:

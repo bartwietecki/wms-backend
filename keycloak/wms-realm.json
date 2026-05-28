@@ -1,0 +1,88 @@
+{
+  "realm": "wms",
+  "enabled": true,
+  "displayName": "WMS",
+  "roles": {
+    "realm": [
+      {
+        "name": "ADMIN",
+        "description": "Administrator — full access to all work entries",
+        "composite": false,
+        "clientRole": false
+      },
+      {
+        "name": "EMPLOYEE",
+        "description": "Employee — can create and manage own work entries",
+        "composite": false,
+        "clientRole": false
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "wms-client",
+      "name": "WMS Client",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:5173/*",
+        "http://localhost:3000/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173",
+        "http://localhost:3000"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "enabled": true,
+      "firstName": "Admin",
+      "lastName": "User",
+      "email": "admin@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ADMIN"]
+    },
+    {
+      "username": "jan.kowalski",
+      "enabled": true,
+      "firstName": "Jan",
+      "lastName": "Kowalski",
+      "email": "jan.kowalski@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "anna.nowak",
+      "enabled": true,
+      "firstName": "Anna",
+      "lastName": "Nowak",
+      "email": "anna.nowak@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
+    }
+  ]
+}
