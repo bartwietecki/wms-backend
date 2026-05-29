@@ -23,8 +23,8 @@ services:
     image: quay.io/keycloak/keycloak:26.0.0
     container_name: wms-keycloak
     environment:
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       KC_HOSTNAME_URL: http://localhost:9090
       KC_HOSTNAME_STRICT: "false"
       KC_HEALTH_ENABLED: "true"

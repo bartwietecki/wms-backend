@@ -83,6 +83,96 @@
         }
       ],
       "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "piotr.wisniewski",
+      "enabled": true,
+      "firstName": "Piotr",
+      "lastName": "Wiśniewski",
+      "email": "piotr.wisniewski@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "karolina.wojcik",
+      "enabled": true,
+      "firstName": "Karolina",
+      "lastName": "Wójcik",
+      "email": "karolina.wojcik@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "michal.kaminski",
+      "enabled": true,
+      "firstName": "Michał",
+      "lastName": "Kamiński",
+      "email": "michal.kaminski@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "zuzanna.lewandowska",
+      "enabled": true,
+      "firstName": "Zuzanna",
+      "lastName": "Lewandowska",
+      "email": "zuzanna.lewandowska@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "tomasz.zielinski",
+      "enabled": false,
+      "firstName": "Tomasz",
+      "lastName": "Zieliński",
+      "email": "tomasz.zielinski@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
+    },
+    {
+      "username": "natalia.szymanska",
+      "enabled": true,
+      "firstName": "Natalia",
+      "lastName": "Szymańska",
+      "email": "natalia.szymanska@wms.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password123",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["EMPLOYEE"]
     }
   ]
 }
