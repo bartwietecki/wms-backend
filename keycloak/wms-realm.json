@@ -2,6 +2,7 @@
   "realm": "wms",
   "enabled": true,
   "displayName": "WMS",
+  "loginTheme": "wms",
   "roles": {
     "realm": [
       {

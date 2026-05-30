@@ -31,6 +31,7 @@ services:
     command: ["start-dev", "--import-realm"]
     volumes:
       - ./keycloak:/opt/keycloak/data/import
+      - ./keycloak/themes:/opt/keycloak/themes
     ports:
       - "9090:8080"
     networks:
