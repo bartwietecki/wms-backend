@@ -2,6 +2,7 @@
   "realm": "wms",
   "enabled": true,
   "displayName": "WMS",
+  "loginTheme": "wms",
   "roles": {
     "realm": [
       {
@@ -35,13 +36,18 @@
       "webOrigins": [
         "http://localhost:5173",
         "http://localhost:3000"
-      ]
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:5173/*##http://localhost:3000/*",
+        "backchannel.logout.session.required": "true"
+      }
     }
   ],
   "users": [
     {
       "username": "admin",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Admin",
       "lastName": "User",
       "email": "admin@wms.local",
@@ -57,6 +63,7 @@
     {
       "username": "jan.kowalski",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Jan",
       "lastName": "Kowalski",
       "email": "jan.kowalski@wms.local",
@@ -72,6 +79,7 @@
     {
       "username": "anna.nowak",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Anna",
       "lastName": "Nowak",
       "email": "anna.nowak@wms.local",
@@ -87,6 +95,7 @@
     {
       "username": "piotr.wisniewski",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Piotr",
       "lastName": "Wiśniewski",
       "email": "piotr.wisniewski@wms.local",
@@ -102,6 +111,7 @@
     {
       "username": "karolina.wojcik",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Karolina",
       "lastName": "Wójcik",
       "email": "karolina.wojcik@wms.local",
@@ -117,6 +127,7 @@
     {
       "username": "michal.kaminski",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Michał",
       "lastName": "Kamiński",
       "email": "michal.kaminski@wms.local",
@@ -132,6 +143,7 @@
     {
       "username": "zuzanna.lewandowska",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Zuzanna",
       "lastName": "Lewandowska",
       "email": "zuzanna.lewandowska@wms.local",
@@ -147,6 +159,7 @@
     {
       "username": "tomasz.zielinski",
       "enabled": false,
+      "emailVerified": true,
       "firstName": "Tomasz",
       "lastName": "Zieliński",
       "email": "tomasz.zielinski@wms.local",
@@ -162,6 +175,7 @@
     {
       "username": "natalia.szymanska",
       "enabled": true,
+      "emailVerified": true,
       "firstName": "Natalia",
       "lastName": "Szymańska",
       "email": "natalia.szymanska@wms.local",
