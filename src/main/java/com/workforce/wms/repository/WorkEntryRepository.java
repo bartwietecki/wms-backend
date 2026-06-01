@@ -1,6 +1,7 @@
 package com.workforce.wms.repository;
 
 import com.workforce.wms.entity.WorkEntry;
+import com.workforce.wms.entity.WorkEntryStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -18,6 +19,8 @@ public interface WorkEntryRepository extends JpaRepository<WorkEntry, Long>, Jpa
             LocalDate from,
             LocalDate to
     );
+
+    long countByEmployeeIdAndStatus(Long employeeId, WorkEntryStatus status);
 
     List<WorkEntry> findAllByOrderByWorkDateDesc();
 
