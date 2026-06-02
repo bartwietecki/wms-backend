@@ -10,6 +10,8 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     boolean existsByEmail(String email);
 
+    long countByActive(boolean active);
+
     Page<Employee> findAllByActive(boolean active, Pageable pageable);
 
     Optional<Employee> findByUser_Username(String username);

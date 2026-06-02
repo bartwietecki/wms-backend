@@ -1,8 +1,10 @@
 package com.workforce.wms.service;
 
+import com.workforce.wms.dto.dashboard.AdminDashboardResponse;
 import com.workforce.wms.dto.dashboard.EmployeeDashboardResponse;
 import com.workforce.wms.entity.Employee;
 import com.workforce.wms.entity.WorkEntryStatus;
+import com.workforce.wms.repository.EmployeeRepository;
 import com.workforce.wms.repository.WorkEntryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,9 +16,20 @@ import java.time.LocalDate;
 public class DashboardService {
 
     private final WorkEntryRepository workEntryRepository;
+    private final EmployeeRepository employeeRepository;
 
-    public DashboardService(WorkEntryRepository workEntryRepository) {
+    public DashboardService(WorkEntryRepository workEntryRepository, EmployeeRepository employeeRepository) {
         this.workEntryRepository = workEntryRepository;
+        this.employeeRepository = employeeRepository;
+    }
+
+    public AdminDashboardResponse getAdminDashboard() {
+        long pendingApprovalsCount = workEntryRepository.countByStatus(WorkEntryStatus.PENDING);
+        long activeEmployeesCount = employeeRepository.countByActive(true);
+        // TODO replace with real value when Leave Requests module is implemented
+        int employeesOnLeaveToday = 0;
+
+        return new AdminDashboardResponse(pendingApprovalsCount, activeEmployeesCount, employeesOnLeaveToday);
     }
 
     public EmployeeDashboardResponse getEmployeeDashboard(Employee employee) {
