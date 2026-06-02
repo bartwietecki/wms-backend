@@ -81,4 +81,24 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
+
+    @ExceptionHandler(LeaveRequestNotFoundException.class)
+    public ResponseEntity<ApiError> handleLeaveRequestNotFound(LeaveRequestNotFoundException ex) {
+        ApiError body = new ApiError(
+                "LEAVE_REQUEST_NOT_FOUND",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(InvalidLeaveRequestException.class)
+    public ResponseEntity<ApiError> handleInvalidLeaveRequest(InvalidLeaveRequestException ex) {
+        ApiError body = new ApiError(
+                "INVALID_LEAVE_REQUEST",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.badRequest().body(body);
+    }
 }
