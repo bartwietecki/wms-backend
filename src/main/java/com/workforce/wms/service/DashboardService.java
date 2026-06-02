@@ -33,12 +33,12 @@ public class DashboardService {
 
         int totalHoursThisMonth = totalMinutesThisMonth / 60;
 
-        long pendingCount = workEntryRepository.countByEmployeeIdAndStatus(
-                employee.getId(), WorkEntryStatus.PENDING);
-        long approvedCount = workEntryRepository.countByEmployeeIdAndStatus(
-                employee.getId(), WorkEntryStatus.APPROVED);
-        long rejectedCount = workEntryRepository.countByEmployeeIdAndStatus(
-                employee.getId(), WorkEntryStatus.REJECTED);
+        long pendingCount = workEntryRepository.countByEmployeeIdAndStatusAndWorkDateBetween(
+                employee.getId(), WorkEntryStatus.PENDING, monthStart, monthEnd);
+        long approvedCount = workEntryRepository.countByEmployeeIdAndStatusAndWorkDateBetween(
+                employee.getId(), WorkEntryStatus.APPROVED, monthStart, monthEnd);
+        long rejectedCount = workEntryRepository.countByEmployeeIdAndStatusAndWorkDateBetween(
+                employee.getId(), WorkEntryStatus.REJECTED, monthStart, monthEnd);
 
         // TODO replace with real value when Leave Requests module is implemented
         int leaveDaysRemaining = 0;

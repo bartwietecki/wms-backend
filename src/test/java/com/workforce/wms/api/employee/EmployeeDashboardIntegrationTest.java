@@ -31,26 +31,46 @@ class EmployeeDashboardIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    // Authenticated employee → 200, status counts reflect only own entries
+    // Base fixture entries are dated 2026-03-01
+    // Dashboard must show only current-month data, so all counts must be 0
     @Test
-    void getDashboard_shouldReturnCorrectStatusCounts() throws Exception {
+    void getDashboard_statusCounts_shouldExcludePreviousMonthEntries() throws Exception {
         mockMvc.perform(get("/api/employee/dashboard")
                         .with(httpBasic(JAN, EMP_PASS)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.pendingEntriesCount").value(1))
-                .andExpect(jsonPath("$.approvedEntriesCount").value(1))
+                .andExpect(jsonPath("$.pendingEntriesCount").value(0))
+                .andExpect(jsonPath("$.approvedEntriesCount").value(0))
                 .andExpect(jsonPath("$.rejectedEntriesCount").value(0))
                 .andExpect(jsonPath("$.leaveDaysRemaining").value(0));
+    }
+
+    // Status counts reflect only current-month entries for the authenticated employee
+    @Test
+    void getDashboard_statusCounts_shouldOnlyCountCurrentMonthEntries() throws Exception {
+        // given - add 2 PENDING, 1 APPROVED, 1 REJECTED in the current month for Jan
+        Employee jan = employeeRepository.findByUser_Username(JAN).orElseThrow();
+        persistCurrentMonthEntry(jan, WorkEntryStatus.PENDING, 480);
+        persistCurrentMonthEntry(jan, WorkEntryStatus.PENDING, 240);
+        persistCurrentMonthEntry(jan, WorkEntryStatus.APPROVED, 480);
+        persistCurrentMonthEntry(jan, WorkEntryStatus.REJECTED, 120);
+
+        // when / then
+        mockMvc.perform(get("/api/employee/dashboard")
+                        .with(httpBasic(JAN, EMP_PASS)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.pendingEntriesCount").value(2))
+                .andExpect(jsonPath("$.approvedEntriesCount").value(1))
+                .andExpect(jsonPath("$.rejectedEntriesCount").value(1));
     }
 
     // totalHoursThisMonth sums only the current calendar month's entries
     @Test
     void getDashboard_shouldCalculateTotalHoursForCurrentMonthOnly() throws Exception {
         // given - two entries in the current month: 480 + 240 = 720 min = 12 hours
-        // The base fixture entries (2026-03-01) are in March and can NOT be counted
+        // The base fixture entries (2026-03-01) are in March and must NOT be counted
         Employee jan = employeeRepository.findByUser_Username(JAN).orElseThrow();
-        persistCurrentMonthEntry(jan, 480); // 8 hours
-        persistCurrentMonthEntry(jan, 240); // 4 hours
+        persistCurrentMonthEntry(jan, WorkEntryStatus.PENDING, 480); // 8 hours
+        persistCurrentMonthEntry(jan, WorkEntryStatus.PENDING, 240); // 4 hours
 
         // when / then
         mockMvc.perform(get("/api/employee/dashboard")
@@ -59,12 +79,12 @@ class EmployeeDashboardIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.totalHoursThisMonth").value(12));
     }
 
-    // Monthly hours are isolated to the authenticated employee - Anna's entries don't count
+    // Monthly data is isolated to the authenticated employee - Anna's entries don't count
     @Test
     void getDashboard_totalHoursThisMonth_shouldNotIncludeOtherEmployeesEntries() throws Exception {
         // given - add a current-month entry for Anna only
         Employee anna = employeeRepository.findByUser_Username(ANNA).orElseThrow();
-        persistCurrentMonthEntry(anna, 480);
+        persistCurrentMonthEntry(anna, WorkEntryStatus.PENDING, 480);
 
         // when / then - Jan has no current-month entries, so hours must be 0
         mockMvc.perform(get("/api/employee/dashboard")
@@ -73,13 +93,12 @@ class EmployeeDashboardIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.totalHoursThisMonth").value(0));
     }
 
-    // saves a PENDING work entry for the first day of the current month
-    private void persistCurrentMonthEntry(Employee employee, int minutes) {
+    private void persistCurrentMonthEntry(Employee employee, WorkEntryStatus status, int minutes) {
         WorkEntry entry = new WorkEntry();
         entry.setEmployee(employee);
         entry.setWorkDate(LocalDate.now().withDayOfMonth(1));
         entry.setMinutes(minutes);
-        entry.setStatus(WorkEntryStatus.PENDING);
+        entry.setStatus(status);
         workEntryRepository.save(entry);
     }
 }
