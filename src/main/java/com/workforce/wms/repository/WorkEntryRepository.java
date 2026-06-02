@@ -27,6 +27,8 @@ public interface WorkEntryRepository extends JpaRepository<WorkEntry, Long>, Jpa
             LocalDate to
     );
 
+    long countByStatus(WorkEntryStatus status);
+
     List<WorkEntry> findAllByOrderByWorkDateDesc();
 
     boolean existsByEmployeeId(Long employeeId);
