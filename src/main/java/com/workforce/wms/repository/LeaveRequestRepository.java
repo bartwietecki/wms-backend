@@ -8,6 +8,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -16,11 +18,16 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
 
     List<LeaveRequest> findAllByEmployeeIdOrderByCreatedAtDesc(Long employeeId);
 
-    // Used by admin dashboard: count approved leaves that cover a specific date
-    long countByStatusAndStartDateLessThanEqualAndEndDateGreaterThanEqual(
-            LeaveRequestStatus status,
-            LocalDate startDate,
-            LocalDate endDate
+    @Query("""
+            select count(distinct lr.employee.id)
+            from LeaveRequest lr
+            where lr.status = :status
+              and lr.startDate <= :today
+              and lr.endDate >= :today
+            """)
+    long countDistinctEmployeesOnLeaveToday(
+            @Param("status") LeaveRequestStatus status,
+            @Param("today") LocalDate today
     );
 
     @EntityGraph(attributePaths = "employee")

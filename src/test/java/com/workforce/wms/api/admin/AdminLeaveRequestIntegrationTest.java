@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -71,6 +70,24 @@ class AdminLeaveRequestIntegrationTest extends AbstractIntegrationTest {
                         .with(httpBasic(ADMIN, ADMIN_PASS)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("REJECTED"));
+    }
+
+    // Admin filters by status=PENDING → returns only PENDING requests
+    @Test
+    void getAll_whenFilteredByPendingStatus_shouldReturnOnlyPending() throws Exception {
+        // given - Jan has PENDING, Anna has APPROVED
+        Employee jan = employeeRepository.findByUser_Username(JAN).orElseThrow();
+        Employee anna = employeeRepository.findByUser_Username(ANNA).orElseThrow();
+        persistLeaveRequest(jan, LeaveRequestStatus.PENDING);
+        persistLeaveRequest(anna, LeaveRequestStatus.APPROVED);
+
+        // when / then
+        mockMvc.perform(get("/api/admin/leave-requests")
+                        .param("status", "PENDING")
+                        .with(httpBasic(ADMIN, ADMIN_PASS)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].status").value("PENDING"));
     }
 
     // Approve non-PENDING → 400

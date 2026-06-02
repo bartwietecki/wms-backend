@@ -39,7 +39,7 @@ public class LeaveRequestService {
         leaveRequest.setStartDate(request.startDate());
         leaveRequest.setEndDate(request.endDate());
         leaveRequest.setStatus(LeaveRequestStatus.PENDING);
-        leaveRequest.setReason(request.reason());
+        leaveRequest.setReason(request.reason() != null ? request.reason().trim() : null);
 
         return toResponse(leaveRequestRepository.save(leaveRequest));
     }
