@@ -1,7 +1,6 @@
 package com.workforce.wms.repository;
 
 import com.workforce.wms.entity.MonthlyWorkReport;
-import com.workforce.wms.entity.MonthlyWorkReportStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

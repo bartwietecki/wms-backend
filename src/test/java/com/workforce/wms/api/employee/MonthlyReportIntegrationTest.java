@@ -4,10 +4,15 @@ import com.workforce.wms.AbstractIntegrationTest;
 import com.workforce.wms.entity.Employee;
 import com.workforce.wms.entity.MonthlyWorkReport;
 import com.workforce.wms.entity.MonthlyWorkReportStatus;
+import com.workforce.wms.entity.WorkEntry;
+import com.workforce.wms.entity.WorkEntryStatus;
 import com.workforce.wms.repository.EmployeeRepository;
 import com.workforce.wms.repository.MonthlyWorkReportRepository;
+import com.workforce.wms.repository.WorkEntryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
@@ -24,6 +29,9 @@ class MonthlyReportIntegrationTest extends AbstractIntegrationTest {
 
     @Autowired
     private MonthlyWorkReportRepository reportRepository;
+
+    @Autowired
+    private WorkEntryRepository workEntryRepository;
 
     // Unauthenticated → 401
     @Test
@@ -147,6 +155,29 @@ class MonthlyReportIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].month").value(3))   // newest first
                 .andExpect(jsonPath("$[1].month").value(2));
+    }
+
+    // Preview entries are sorted by workDate ASC (chronological order)
+    @Test
+    void preview_shouldReturnEntriesSortedByWorkDateAsc() throws Exception {
+        Employee jan = employeeRepository.findByUser_Username(JAN).orElseThrow();
+
+        // Fixture gives Jan 2 entries on 2026-03-01. Add one on 2026-03-05 (later date).
+        WorkEntry laterEntry = new WorkEntry();
+        laterEntry.setEmployee(jan);
+        laterEntry.setWorkDate(LocalDate.of(2026, 3, 5));
+        laterEntry.setMinutes(120);
+        laterEntry.setDescription("Later entry");
+        laterEntry.setStatus(WorkEntryStatus.PENDING);
+        workEntryRepository.save(laterEntry);
+
+        mockMvc.perform(get("/api/reports/monthly/preview")
+                        .param("year", "2026").param("month", "3")
+                        .with(httpBasic(JAN, EMP_PASS)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.entries", hasSize(3)))
+                .andExpect(jsonPath("$.entries[0].workDate").value("2026-03-01"))  // earliest first
+                .andExpect(jsonPath("$.entries[2].workDate").value("2026-03-05")); // latest last
     }
 
     // Employee cannot access admin reports endpoint → 403

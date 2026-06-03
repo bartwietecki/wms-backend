@@ -98,7 +98,7 @@ public class MonthlyWorkReportService {
                 throw new InvalidMonthlyReportException(
                         "Report for " + year + "/" + month + " is already approved");
             }
-            // REJECTED → allow resubmit: reset review fields
+            // REJECTED - allow resubmit (reset review fields)
             report.setReviewedAt(null);
             report.setAdminComment(null);
         }
@@ -188,7 +188,7 @@ public class MonthlyWorkReportService {
     private List<WorkEntry> entriesForMonth(Long employeeId, int year, int month) {
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth());
-        return workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateDesc(
+        return workEntryRepository.findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateAsc(
                 employeeId, monthStart, monthEnd);
     }
 
