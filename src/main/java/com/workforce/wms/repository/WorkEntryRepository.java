@@ -20,6 +20,12 @@ public interface WorkEntryRepository extends JpaRepository<WorkEntry, Long>, Jpa
             LocalDate to
     );
 
+    List<WorkEntry> findAllByEmployeeIdAndWorkDateBetweenOrderByWorkDateAsc(
+            Long employeeId,
+            LocalDate from,
+            LocalDate to
+    );
+
     long countByEmployeeIdAndStatusAndWorkDateBetween(
             Long employeeId,
             WorkEntryStatus status,

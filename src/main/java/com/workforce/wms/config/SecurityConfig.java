@@ -46,6 +46,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/employee/**").hasRole(ROLE_EMPLOYEE)
                             .requestMatchers("/api/work-entries/**").hasRole(ROLE_EMPLOYEE)
                             .requestMatchers("/api/leave-requests/**").hasRole(ROLE_EMPLOYEE)
+                            .requestMatchers("/api/reports/**").hasRole(ROLE_EMPLOYEE)
                             .anyRequest().authenticated()
                     )
                     .httpBasic(Customizer.withDefaults());

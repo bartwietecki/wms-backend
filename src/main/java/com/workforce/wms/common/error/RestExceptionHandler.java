@@ -101,4 +101,24 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.badRequest().body(body);
     }
+
+    @ExceptionHandler(MonthlyReportNotFoundException.class)
+    public ResponseEntity<ApiError> handleMonthlyReportNotFound(MonthlyReportNotFoundException ex) {
+        ApiError body = new ApiError(
+                "MONTHLY_REPORT_NOT_FOUND",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(InvalidMonthlyReportException.class)
+    public ResponseEntity<ApiError> handleInvalidMonthlyReport(InvalidMonthlyReportException ex) {
+        ApiError body = new ApiError(
+                "INVALID_MONTHLY_REPORT",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.badRequest().body(body);
+    }
 }
