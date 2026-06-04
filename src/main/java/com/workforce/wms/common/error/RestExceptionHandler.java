@@ -121,4 +121,14 @@ public class RestExceptionHandler {
         );
         return ResponseEntity.badRequest().body(body);
     }
+
+    @ExceptionHandler(ReportAccessDeniedException.class)
+    public ResponseEntity<ApiError> handleReportAccessDenied(ReportAccessDeniedException ex) {
+        ApiError body = new ApiError(
+                "REPORT_ACCESS_DENIED",
+                ex.getMessage(),
+                List.of()
+        );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
 }

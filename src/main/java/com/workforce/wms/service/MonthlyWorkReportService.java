@@ -2,6 +2,7 @@ package com.workforce.wms.service;
 
 import com.workforce.wms.common.error.InvalidMonthlyReportException;
 import com.workforce.wms.common.error.MonthlyReportNotFoundException;
+import com.workforce.wms.common.error.ReportAccessDeniedException;
 import com.workforce.wms.dto.report.MonthlyReportDetailResponse;
 import com.workforce.wms.dto.report.MonthlyReportPreviewResponse;
 import com.workforce.wms.dto.report.MonthlyReportResponse;
@@ -128,6 +129,23 @@ public class MonthlyWorkReportService {
                 .and(MonthlyWorkReportSpecifications.hasMonth(month));
 
         return reportRepository.findAll(spec, pageable).map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    public MonthlyReportDetailResponse getEmployeeReportDetail(Employee employee, Long reportId) {
+        MonthlyWorkReport report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new MonthlyReportNotFoundException(reportId));
+
+        if (!report.getEmployee().getId().equals(employee.getId())) {
+            throw new ReportAccessDeniedException(reportId);
+        }
+
+        List<WorkEntry> entries = entriesForMonth(employee.getId(), report.getYear(), report.getMonth());
+        List<WorkEntryResponse> entryResponses = entries.stream()
+                .map(we -> toWorkEntryResponse(we, employee))
+                .toList();
+
+        return toDetailResponse(report, entryResponses);
     }
 
     @Transactional(readOnly = true)
