@@ -41,7 +41,7 @@ class MonthlyReportPdfIntegrationTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Type", "application/pdf"))
                 .andExpect(header().string("Content-Disposition",
-                        "attachment; filename=\"monthly-report-" + jan.getId() + "-2026-3.pdf\""))
+                        "attachment; filename=\"monthly-report-jan-kowalski-03-2026.pdf\""))
                 .andReturn();
 
         byte[] body = result.getResponse().getContentAsByteArray();
