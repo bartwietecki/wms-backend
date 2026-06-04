@@ -4,12 +4,16 @@ import com.workforce.wms.dto.report.MonthlyReportDetailResponse;
 import com.workforce.wms.dto.report.MonthlyReportResponse;
 import com.workforce.wms.dto.report.RejectMonthlyReportRequest;
 import com.workforce.wms.entity.MonthlyWorkReportStatus;
+import com.workforce.wms.service.MonthlyReportPdfService;
 import com.workforce.wms.service.MonthlyWorkReportService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,9 +21,12 @@ import org.springframework.web.bind.annotation.*;
 public class AdminMonthlyReportController {
 
     private final MonthlyWorkReportService monthlyWorkReportService;
+    private final MonthlyReportPdfService monthlyReportPdfService;
 
-    public AdminMonthlyReportController(MonthlyWorkReportService monthlyWorkReportService) {
+    public AdminMonthlyReportController(MonthlyWorkReportService monthlyWorkReportService,
+                                        MonthlyReportPdfService monthlyReportPdfService) {
         this.monthlyWorkReportService = monthlyWorkReportService;
+        this.monthlyReportPdfService = monthlyReportPdfService;
     }
 
     @GetMapping
@@ -49,5 +56,28 @@ public class AdminMonthlyReportController {
             @Valid @RequestBody RejectMonthlyReportRequest request
     ) {
         return monthlyWorkReportService.reject(id, request.adminComment());
+    }
+
+    @GetMapping("/{id}/pdf")
+    public ResponseEntity<byte[]> exportPdf(@PathVariable Long id) {
+        MonthlyReportDetailResponse detail = monthlyWorkReportService.getAdminReportDetail(id);
+        byte[] pdf = monthlyReportPdfService.generate(detail);
+
+        String employeeSlug = detail.employeeName()
+                .toLowerCase()
+                .replaceAll("\\s+", "-");
+
+        String filename =
+                "monthly-report-"
+                        + employeeSlug
+                        + "-"
+                        + String.format("%02d", detail.month())
+                        + "-"
+                        + detail.year() + ".pdf";
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(pdf);
     }
 }
