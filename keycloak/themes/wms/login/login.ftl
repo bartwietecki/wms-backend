@@ -11,7 +11,7 @@
         <div class="wms-card">
 
             <div class="wms-brand">
-                <div class="wms-brand-mark">&#9638;</div>
+                <div class="wms-brand-mark">&#9881;&#65039;</div>
                 <span class="wms-brand-text">WMS</span>
             </div>
 
