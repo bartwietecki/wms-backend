@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
@@ -99,17 +101,22 @@ public class SecurityConfig {
     }
 
     @Bean
-    public InMemoryUserDetailsManager userDetailsService(WmsSecurityProperties props) {
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService(WmsSecurityProperties props, PasswordEncoder passwordEncoder) {
         List<UserDetails> users = new ArrayList<>();
 
         users.add(User.withUsername(props.admin().username())
-                .password("{noop}" + props.admin().password())
+                .password(passwordEncoder.encode(props.admin().password()))
                 .roles(ROLE_ADMIN)
                 .build());
 
         for (WmsSecurityProperties.User emp : props.employees()) {
             users.add(User.withUsername(emp.username())
-                    .password("{noop}" + emp.password())
+                    .password(passwordEncoder.encode(emp.password()))
                     .roles(ROLE_EMPLOYEE)
                     .build());
         }

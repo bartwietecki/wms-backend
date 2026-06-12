@@ -3,9 +3,9 @@ spring:
     name: wms
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/wms
-    username: wms
-    password: wms
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/wms}
+    username: ${SPRING_DATASOURCE_USERNAME:wms}
+    password: ${SPRING_DATASOURCE_PASSWORD:wms}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -36,8 +36,7 @@ management:
 
 wms:
   cors:
-    allowed-origins:
-      - http://localhost:5173
+    allowed-origins: ${WMS_CORS_ALLOWED_ORIGINS:http://localhost:5173}
   security:
     admin:
       username: ${WMS_ADMIN_USERNAME}

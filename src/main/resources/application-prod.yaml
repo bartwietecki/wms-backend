@@ -1,0 +1,45 @@
+# PROD PROFILE -> activated via SPRING_PROFILES_ACTIVE=prod
+
+# All env vars here have NO fallback defaults.
+# A missing variable causes a hard startup failure - intentional fail-fast behaviour.
+# Local dev continues to use application.yaml with localhost defaults.
+
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${WMS_JWT_ISSUER_URI}
+          jwk-set-uri: ${WMS_JWT_JWK_SET_URI}
+
+  flyway:
+    out-of-order: false
+    validate-on-migrate: true
+
+logging:
+  structured:
+    format:
+      console: ecs
+  level:
+    root: WARN
+    com.workforce.wms: INFO
+
+management:
+  endpoint:
+    health:
+      show-details: never
+
+wms:
+  cors:
+    allowed-origins: ${WMS_CORS_ALLOWED_ORIGINS}

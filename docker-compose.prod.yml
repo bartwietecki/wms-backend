@@ -1,0 +1,29 @@
+# Production overrides - merge on top of docker-compose.yml:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Differences from dev:
+#   - Keycloak runs in production mode (start vs start-dev)
+#   - Keycloak trusts X-Forwarded-* headers from a reverse proxy (Caddy / Nginx)
+#   - Spring prod profile activated - no localhost fallbacks, strict fail-fast, JSON logging
+#   - Internal ports not re-exported (traffic flows through reverse proxy only)
+
+services:
+
+  keycloak:
+    command: ["start", "--import-realm"]
+    environment:
+      KC_HOSTNAME_STRICT: "true"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+    ports: !reset []
+
+  wms-backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+    ports: !reset []
+
+  wms-frontend:
+    build:
+      args:
+        VITE_KEYCLOAK_URL: ${VITE_KEYCLOAK_URL}
+    ports: !reset []
