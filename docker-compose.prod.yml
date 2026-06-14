@@ -10,7 +10,7 @@
 services:
 
   keycloak:
-    command: ["start", "--import-realm"]
+    command: ["start"]
     environment:
       KC_HOSTNAME_STRICT: "true"
       KC_HTTP_ENABLED: "true"

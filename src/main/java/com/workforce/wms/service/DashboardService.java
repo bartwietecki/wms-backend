@@ -58,7 +58,9 @@ public class DashboardService {
         long rejectedCount = workEntryRepository.countByEmployeeIdAndStatusAndWorkDateBetween(
                 employee.getId(), WorkEntryStatus.REJECTED, monthStart, monthEnd);
 
-        // TODO replace with real value when Leave Requests module is implemented
+        // The Leave Requests module is implemented, but there is no leave-allowance concept yet,
+        // so a real remaining balance cannot be computed.
+        // Hardcoded until an allowance/entitlement model is introduced.
         int leaveDaysRemaining = 0;
 
         return new EmployeeDashboardResponse(
