@@ -43,6 +43,19 @@
                 <button class="wms-btn" type="submit">Sign in</button>
             </form>
 
+            <div class="wms-demo">
+                <p class="wms-demo-title">Demo Access</p>
+                <p class="wms-demo-role">Employee</p>
+                <div class="wms-demo-row">
+                    <span class="wms-demo-key">Username</span>
+                    <code class="wms-demo-val">employee.demo</code>
+                </div>
+                <div class="wms-demo-row">
+                    <span class="wms-demo-key">Password</span>
+                    <code class="wms-demo-val">demo123</code>
+                </div>
+            </div>
+
         </div>
     </div>
 </body>

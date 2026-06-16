@@ -158,3 +158,51 @@ body {
     outline: 2px solid #2563eb;
     outline-offset: 2px;
 }
+
+/* Demo access box */
+.wms-demo {
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+}
+
+.wms-demo-title {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1d4ed8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.wms-demo-role {
+    margin: 0 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.wms-demo-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.8;
+}
+
+.wms-demo-key {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.wms-demo-val {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e3a8a;
+    background: #dbeafe;
+    padding: 1px 7px;
+    border-radius: 4px;
+}
